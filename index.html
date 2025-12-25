@@ -1,46 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="vKpEfaaix3tyf3KNuLOD4z3LE4K1_5RnaU_lwqDOD9U" />
-    <title>Free Fire Posters</title>
-    <link rel="icon" type="image" href="/common/image/LOGO_FF_SHORT.png" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Primary Meta Tags -->
+    <title>Free Fire Posters - Official Banners & News | Free Fire Elite Portal</title>
+    <meta name="title" content="Free Fire Posters - Official Banners & News | Free Fire Elite Portal">
+    <meta name="description"
+        content="Discover the latest Free Fire posters, event banners, and news from all regions. Browse official Free Fire content from Vietnam, Brazil, India, Indonesia, and more. Your ultimate Free Fire media hub.">
+    <meta name="keywords"
+        content="free fire, free fire posters, free fire banners, free fire events, free fire news, garena free fire, free fire official, free fire vietnam, free fire brazil, free fire india">
+    <meta name="author" content="Free Fire Elite Portal">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://freefireposter.site/" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-navbutton-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://freefireposter.site/">
+    <meta property="og:title" content="Free Fire Posters - Official Banners & News">
+    <meta property="og:description"
+        content="Discover the latest Free Fire posters, event banners, and news from all regions. Your ultimate Free Fire media hub.">
+    <meta property="og:image" content="https://freefireposter.site/common/image/LOGO_FF_SHORT.png">
+    <meta property="og:site_name" content="Free Fire Elite Portal">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="vi_VN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://freefireposter.site/">
+    <meta name="twitter:title" content="Free Fire Posters - Official Banners & News">
+    <meta name="twitter:description"
+        content="Discover the latest Free Fire posters, event banners, and news from all regions.">
+    <meta name="twitter:image" content="https://freefireposter.site/common/image/LOGO_FF_SHORT.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/common/image/LOGO_FF_SHORT.png" />
+    <link rel="apple-touch-icon" href="/common/image/LOGO_FF_SHORT.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://lscypgvlydfdhiulzbwu.supabase.co" crossorigin>
+    <link rel="preconnect" href="https://ik.imagekit.io" crossorigin>
+    <link rel="preconnect" href="https://dl.dir.freefiremobile.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        crossorigin="anonymous">
     <link rel="stylesheet" href="/common/css/style.css">
 </head>
 
 <body>
 
-    <header class="header">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-to-content" style="position: absolute; left: -9999px; z-index: 999;"
+        aria-label="Skip to main content">Skip to main content</a>
+
+    <header class="header" role="banner">
         <div class="logo">
-            <a href="/">
-                <img src="/common/image/LOGO_FF_SHORT.png" alt="Logo">
+            <a href="/" aria-label="Free Fire Posters Homepage">
+                <img src="/common/image/LOGO_FF_SHORT.png" alt="Free Fire Logo" width="35" height="35">
             </a>
         </div>
 
         <div class="header-controls">
-            <li class="dropdown language-selector" id="mobileLangSelector">
-                <a href="#" class="nav-link lang-toggle" title="Select Region/Language">
-                    <img src="/common/image/language.png" alt="Language">
+            <li class="dropdown language-selector" id="mobileLangSelector" aria-label="Language selection">
+                <a href="#" class="nav-link lang-toggle" title="Select Region/Language"
+                    aria-label="Language menu toggle">
+                    <img src="/common/image/language.png" alt="Language icon" width="20" height="20">
                 </a>
-                <ul class="dropdown-menu language-menu">
+                <ul class="dropdown-menu language-menu" role="menu" aria-label="Language options">
                     <li><a href="#" data-lang="default">EN</a></li>
                     <li><a href="#" data-lang="vietnam">VI</a></li>
                 </ul>
             </li>
 
-            <div class="menu-toggle">
+            <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false"
+                tabindex="0">
                 <i class="fa fa-bars"></i>
             </div>
         </div>
-        <nav class="navbar">
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
             <ul class="nav-links">
                 <li><a href="/" class="nav-link" data-i18n="home_link">HOME</a></li>
                 <li class="dropdown">
-                    <a href="/nation" class="nav-link" data-i18n="nation_link">NATION</a>
-                    <ul class="dropdown-menu">
+                    <a href="/nation" class="nav-link" data-i18n="nation_link" aria-haspopup="true"
+                        aria-expanded="false">NATION</a>
+                    <ul class="dropdown-menu" role="menu">
                         <li><a href="/nation/brazil" id="brazil-link">BRAZIL</a></li>
                         <li><a href="/nation/india" id="india-link">INDIA</a></li>
                         <li><a href="/nation/indonesia" id="indonesia-link">INDONESIA</a></li>
@@ -54,11 +111,13 @@
                 <li><a href="/news" class="nav-link" data-i18n="news_link">NEWS</a></li>
                 <li><a href="/contact" class="nav-link" data-i18n="contact_link">CONTACT</a></li>
 
-                <li class="dropdown language-selector desktop-only-selector" id="desktopLangSelector">
-                    <a href="#" class="nav-link lang-toggle" title="Select Region/Language">
-                        <img src="/common/image/language.png" alt="Language">
+                <li class="dropdown language-selector desktop-only-selector" id="desktopLangSelector"
+                    aria-label="Language selection">
+                    <a href="#" class="nav-link lang-toggle" title="Select Region/Language"
+                        aria-label="Language menu toggle">
+                        <img src="/common/image/language.png" alt="Language icon" width="20" height="20">
                     </a>
-                    <ul class="dropdown-menu language-menu">
+                    <ul class="dropdown-menu language-menu" role="menu" aria-label="Language options">
                         <li><a href="#" data-lang="default">EN</a></li>
                         <li><a href="#" data-lang="vietnam">VI</a></li>
                     </ul>
@@ -67,7 +126,7 @@
         </nav>
     </header>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content" role="main">
         <section id="home-section" class="content-section">
             <img id="background-image"
                 src="https://dl.dir.freefiremobile.com/common/web_event/official2.ff.garena.all/20255/792f0508b08f3f324bd37eefcd07e2ed.jpg"
@@ -134,8 +193,35 @@
             <a id="overlay-link" href="#" target="_blank"></a>
         </div>
     </div>
-    <script src="https://unpkg.com/@imagekit/javascript/dist/imagekit.min.js"></script>
-    <script src="/common/js/script.js"></script>
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Free Fire Elite Portal",
+        "alternateName": "Free Fire Posters",
+        "url": "https://freefireposter.site/",
+        "description": "Official Free Fire posters, event banners, and news from all regions worldwide.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Free Fire Elite Portal",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://freefireposter.site/common/image/LOGO_FF_SHORT.png"
+            }
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://freefireposter.site/nation/{search_term_string}",
+            "query-input": "required name=search_term_string"
+        },
+        "inLanguage": ["en", "vi"]
+    }
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@imagekit/javascript/dist/imagekit.min.js" defer></script>
+    <script src="/common/js/script.js" defer></script>
 </body>
 
 </html>

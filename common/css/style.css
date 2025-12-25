@@ -6,6 +6,11 @@
     font-display: swap;
 }
 
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -44,6 +49,28 @@ body.non-home-bg .content-section.active {
 a {
     text-decoration: none;
     color: inherit;
+}
+
+/* Improved focus states for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid #ffba00;
+    outline-offset: 2px;
+}
+
+/* Skip to content link for accessibility */
+.skip-to-content:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #ffba00;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 9999;
 }
 
 ul {
@@ -92,6 +119,8 @@ ul {
 
 .nav-link:hover {
     background-color: #000000;
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
 }
 
 .nav-link.active {
@@ -286,11 +315,12 @@ ul {
 }
 
 .grid-item:hover {
-    transform: scale(1.01);
+    transform: scale(1.01) translateZ(0);
     box-shadow:
         0 5px 15px rgba(0, 0, 0, 0.2),
         0 0 15px rgba(0, 123, 255, 0.7);
     z-index: 10;
+    will-change: transform;
 }
 
 .grid-item::before {
@@ -344,6 +374,7 @@ ul {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+    will-change: background-position;
 }
 
 @keyframes gradient-move {
@@ -581,6 +612,8 @@ body.hide-footer .footer {
 
 .social-icon:hover {
     cursor: pointer;
+    transform: translateY(-3px) scale(1.05);
+    transition: all 0.3s ease;
 }
 
 .contact-policy-links {

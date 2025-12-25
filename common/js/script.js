@@ -100,6 +100,33 @@ let navLinks = document.querySelectorAll('.nav-links a');
 const backgroundVideo = document.getElementById('background-video');
 const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
 
+// Lazy Loading Images with Intersection Observer
+let imageObserver = null;
+if ('IntersectionObserver' in window) {
+    imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, {
+        rootMargin: '50px 0px',
+        threshold: 0.01
+    });
+}
+
+// Helper: Observe image for lazy loading
+function lazyLoadImage(img) {
+    if (imageObserver && img.dataset.src) {
+        imageObserver.observe(img);
+    }
+}
+
 function applyTranslation(langKey) {
     const translationSet = translations[langKey] || translations['default'];
 
@@ -180,6 +207,14 @@ async function fetchDataFromAPI() {
 
     } catch (error) {
         console.error("Error fetching data:", error);
+        // User-friendly error handling
+        const t = translations[currentLanguage];
+        if (imageGrid) {
+            imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
+                <h2>⚠️ Connection Error</h2>
+                <p>${error.message || 'Unable to load content. Please try again later.'}</p>
+            </div>`;
+        }
     }
 }
 
@@ -484,6 +519,11 @@ function displayImages(key, isNews = false) {
         const altText = imageData.title || t['no_title'];
 
         const finalAttributes = getOptimizedImageAttributes(imageData.url, altText);
+        
+        // Add native lazy loading
+        imgElement.loading = 'lazy';
+        imgElement.decoding = 'async';
+        
         Object.assign(imgElement, finalAttributes);
 
         imgElement.onerror = () => {
