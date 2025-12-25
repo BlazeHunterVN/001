@@ -100,7 +100,6 @@ let navLinks = document.querySelectorAll('.nav-links a');
 const backgroundVideo = document.getElementById('background-video');
 const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
 
-// Lazy Loading Images with Intersection Observer
 let imageObserver = null;
 if ('IntersectionObserver' in window) {
     imageObserver = new IntersectionObserver((entries, observer) => {
@@ -120,7 +119,6 @@ if ('IntersectionObserver' in window) {
     });
 }
 
-// Helper: Observe image for lazy loading
 function lazyLoadImage(img) {
     if (imageObserver && img.dataset.src) {
         imageObserver.observe(img);
@@ -207,7 +205,6 @@ async function fetchDataFromAPI() {
 
     } catch (error) {
         console.error("Error fetching data:", error);
-        // User-friendly error handling
         const t = translations[currentLanguage];
         if (imageGrid) {
             imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
@@ -277,12 +274,9 @@ function updateSectionHeadings(path, key) {
         nationHeading.textContent = `${t['select_country']}: ${countryName.toUpperCase()}`;
     }
     else if (path === '/nation') {
-        // Thêm điều kiện kiểm tra màn hình desktop (min-width: 769px)
         if (window.innerWidth <= 768) {
-            // Mobile/Tablet: Hiển thị thông báo chọn quốc gia
             nationHeading.textContent = `${t['select_country']} - ${t['select_prompt']}`;
         } else {
-            // PC: Để trống tiêu đề
             nationHeading.textContent = '';
         }
     }
@@ -519,11 +513,10 @@ function displayImages(key, isNews = false) {
         const altText = imageData.title || t['no_title'];
 
         const finalAttributes = getOptimizedImageAttributes(imageData.url, altText);
-        
-        // Add native lazy loading
+
         imgElement.loading = 'lazy';
         imgElement.decoding = 'async';
-        
+
         Object.assign(imgElement, finalAttributes);
 
         imgElement.onerror = () => {

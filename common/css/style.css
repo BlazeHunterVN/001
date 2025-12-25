@@ -6,7 +6,6 @@
     font-display: swap;
 }
 
-/* Smooth scrolling for better UX */
 html {
     scroll-behavior: smooth;
 }
@@ -51,7 +50,6 @@ a {
     color: inherit;
 }
 
-/* Improved focus states for accessibility */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -60,7 +58,6 @@ select:focus-visible {
     outline-offset: 2px;
 }
 
-/* Skip to content link for accessibility */
 .skip-to-content:focus {
     position: fixed;
     top: 10px;

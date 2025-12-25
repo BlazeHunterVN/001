@@ -140,7 +140,6 @@ async function fetchBanners() {
     filterAndRender();
 }
 
-// Helper function to parse DD/MM/YYYY to Date object
 function parseDateString(dateStr) {
     if (!dateStr || !dateStr.trim()) return null;
     const parts = dateStr.trim().split('/');
@@ -157,12 +156,10 @@ function filterAndRender() {
 
     let filtered = allBanners;
 
-    // Filter by nation
     if (selectedNation !== 'all') {
         filtered = filtered.filter(b => b.nation_key === selectedNation);
     }
 
-    // Filter by date range
     const dateFrom = parseDateString(dateFromStr);
     const dateTo = parseDateString(dateToStr);
 
@@ -289,7 +286,7 @@ window.onclick = function (event) {
         bannerModal.style.display = 'none';
     }
 }
-// Bulk delete functionality
+
 function updateCheckboxListeners() {
     const checkboxes = document.querySelectorAll('.banner-checkbox');
     checkboxes.forEach(cb => {
@@ -305,14 +302,12 @@ function updateDeleteButtonVisibility() {
         btnDeleteSelected.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
     }
 
-    // Update select-all checkbox state
     if (selectAllCheckbox) {
         selectAllCheckbox.checked = checkboxes.length > 0 && checkedCount === checkboxes.length;
         selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
     }
 }
 
-// Select all / Deselect all
 if (selectAllCheckbox) {
     selectAllCheckbox.addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.banner-checkbox');
@@ -323,7 +318,6 @@ if (selectAllCheckbox) {
     });
 }
 
-// Delete selected banners
 if (btnDeleteSelected) {
     btnDeleteSelected.addEventListener('click', async function () {
         const checkboxes = document.querySelectorAll('.banner-checkbox:checked');
@@ -349,4 +343,3 @@ if (btnDeleteSelected) {
         }
     });
 }
-
