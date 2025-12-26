@@ -125,6 +125,28 @@ function lazyLoadImage(img) {
     }
 }
 
+let scrollAnimationObserver = null;
+if ('IntersectionObserver' in window) {
+    scrollAnimationObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animated');
+            } else {
+                entry.target.classList.remove('animated');
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px'
+    });
+}
+
+function observeScrollAnimation(element) {
+    if (scrollAnimationObserver && element) {
+        scrollAnimationObserver.observe(element);
+    }
+}
+
 function applyTranslation(langKey) {
     const translationSet = translations[langKey] || translations['default'];
 
@@ -343,6 +365,14 @@ function handleRouting(path, key) {
         window.history.pushState({}, '', path);
     }
 
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen && path !== window.location.pathname) {
+        loadingScreen.classList.remove('hidden');
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 2000);
+    }
+
     if (navbar && navbar.classList.contains('active')) {
         navbar.classList.remove('active');
         const menuIcon = menuToggle.querySelector('i');
@@ -536,8 +566,9 @@ function displayImages(key, isNews = false) {
         titleElement.textContent = altText;
         gridItem.appendChild(titleElement);
 
+        gridItem.classList.add('scroll-animate');
         targetGrid.appendChild(gridItem);
-
+        observeScrollAnimation(gridItem);
     });
 }
 
@@ -864,6 +895,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const parts = currentPath.split('/');
     const key = parts[parts.length - 1] || '';
     handleRouting(currentPath, key);
+});
+
+window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 2000);
+    }
 });
 
 document.addEventListener('click', tryToPlayVideo, { once: true });
