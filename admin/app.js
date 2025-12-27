@@ -14,11 +14,8 @@ const keyInput = document.getElementById('access-key-input');
 const btnLogout = document.getElementById('btn-logout');
 
 const bannerTableBody = document.getElementById('banner-table-body');
-const btnAddBanner = document.getElementById('btn-add-banner');
-const bannerModal = document.getElementById('banner-modal');
-const closeModal = document.querySelector('.close-modal');
 const bannerForm = document.getElementById('banner-form');
-const modalTitle = document.getElementById('modal-title');
+const adminCardTitle = document.querySelector('.admin-card h3');
 
 let isEditing = false;
 let currentEditId = null;
@@ -28,6 +25,12 @@ const filterDateFrom = document.getElementById('filter-date-from');
 const filterDateTo = document.getElementById('filter-date-to');
 const selectAllCheckbox = document.getElementById('select-all-checkbox');
 const btnDeleteSelected = document.getElementById('btn-delete-selected');
+
+const bannerType = document.getElementById('banner-type');
+const bannerNationKey = document.getElementById('banner-nation-key');
+const toggleBannerForm = document.getElementById('toggle-banner-form');
+const adminCard = document.querySelector('.admin-card');
+const cardHeader = document.querySelector('.card-header');
 
 async function checkSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -76,19 +79,20 @@ async function handleKeyLogin() {
         return;
     }
 
-    const { data, error } = await supabaseClient
-        .from('admin_access')
-        .select('*')
-        .eq('email', email)
-        .eq('access_key', key)
-        .single();
+    // Sử dụng RPC function để kiểm tra một cách bảo mật (không cần quyền Select trên bảng)
+    const { data: isValid, error } = await supabaseClient.rpc('verify_admin_key', {
+        p_email: email,
+        p_key: key
+    });
 
-    if (error || !data) {
+    if (error || !isValid) {
         if (error) console.error('Login error:', error);
         showError('Email Or Access Key Is Not Correct!');
     } else {
-        showDashboard();
         localStorage.setItem('admin_granted', 'true');
+        localStorage.setItem('admin_email', email);
+        localStorage.setItem('admin_key', key);
+        showDashboard();
     }
 }
 
@@ -122,6 +126,8 @@ btnKeyLogin.addEventListener('click', handleKeyLogin);
 btnLogout.addEventListener('click', async () => {
     await supabaseClient.auth.signOut();
     localStorage.removeItem('admin_granted');
+    localStorage.removeItem('admin_email');
+    localStorage.removeItem('admin_key');
     window.location.reload();
 });
 
@@ -190,6 +196,31 @@ if (filterDateTo) {
     filterDateTo.addEventListener('input', filterAndRender);
 }
 
+const btnApplyFilter = document.getElementById('btn-apply-filter');
+if (btnApplyFilter) {
+    btnApplyFilter.addEventListener('click', filterAndRender);
+}
+
+if (bannerType) {
+    bannerType.addEventListener('change', () => {
+        if (bannerType.value === 'NEWS') {
+            bannerNationKey.value = 'news'; // We keep 'news' internal for Supabase
+            bannerNationKey.disabled = true;
+            bannerNationKey.required = false;
+        } else {
+            bannerNationKey.disabled = false;
+            bannerNationKey.required = true;
+            if (bannerNationKey.value === 'news') bannerNationKey.value = 'vietnam';
+        }
+    });
+}
+
+if (cardHeader) {
+    cardHeader.addEventListener('click', () => {
+        adminCard.classList.toggle('collapsed');
+    });
+}
+
 function renderBanners(banners) {
     bannerTableBody.innerHTML = '';
     banners.forEach(banner => {
@@ -208,14 +239,21 @@ function renderBanners(banners) {
         bannerTableBody.appendChild(tr);
     });
 
-    // Add event listeners to checkboxes
     updateCheckboxListeners();
     updateDeleteButtonVisibility();
 }
 
 window.deleteBanner = async (id) => {
     if (confirm('Are you sure you want to delete it?')) {
-        const { error } = await supabaseClient.from(SUPABASE_TABLE).delete().eq('id', id);
+        const email = localStorage.getItem('admin_email');
+        const key = localStorage.getItem('admin_key');
+
+        const { error } = await supabaseClient.rpc('manage_banner_delete', {
+            p_email: email,
+            p_key: key,
+            p_ids: [parseInt(id)]
+        });
+
         if (error) alert('Error: ' + error.message);
         else fetchBanners();
     }
@@ -224,7 +262,7 @@ window.deleteBanner = async (id) => {
 window.openEditModal = (id, title, url, link, nation, startDate) => {
     isEditing = true;
     currentEditId = id;
-    modalTitle.textContent = 'EDIT BANNER LANGUAGE';
+    if (adminCardTitle) adminCardTitle.textContent = 'Edit Banner';
 
     document.getElementById('banner-title').value = title;
     document.getElementById('banner-url').value = url;
@@ -232,20 +270,32 @@ window.openEditModal = (id, title, url, link, nation, startDate) => {
     document.getElementById('banner-nation-key').value = nation;
     document.getElementById('banner-start-date').value = startDate;
 
-    bannerModal.style.display = 'block';
+    if (nation === 'news') {
+        bannerType.value = 'NEWS';
+        bannerNationKey.disabled = true;
+    } else {
+        bannerType.value = 'NATION';
+        bannerNationKey.disabled = false;
+    }
+
+    const saveBtn = document.getElementById('btn-save-banner');
+    if (saveBtn) saveBtn.textContent = 'Update Banner';
+
+    const adminCard = document.querySelector('.admin-card');
+    if (adminCard) {
+        adminCard.scrollIntoView({ behavior: 'smooth' });
+    }
 };
 
-btnAddBanner.addEventListener('click', () => {
+function resetForm() {
     isEditing = false;
     currentEditId = null;
-    modalTitle.textContent = 'ADD BANNER LANGUAGE';
+    if (adminCardTitle) adminCardTitle.textContent = 'Add New Banner';
     bannerForm.reset();
-    bannerModal.style.display = 'block';
-});
-
-closeModal.addEventListener('click', () => {
-    bannerModal.style.display = 'none';
-});
+    const saveBtn = document.getElementById('btn-save-banner');
+    if (saveBtn) saveBtn.textContent = 'Add Banner';
+    if (bannerNationKey) bannerNationKey.disabled = false;
+}
 
 bannerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -256,36 +306,32 @@ bannerForm.addEventListener('submit', async (e) => {
     const nation_key = document.getElementById('banner-nation-key').value;
     const start_date = document.getElementById('banner-start-date').value;
 
-    const payload = {
-        title,
-        url,
-        banner_link,
-        nation_key,
-        start_date
+    const email = localStorage.getItem('admin_email');
+    const key = localStorage.getItem('admin_key');
+
+    const rpcPayload = {
+        p_email: email,
+        p_key: key,
+        p_title: title,
+        p_url: url,
+        p_banner_link: banner_link,
+        p_nation_key: nation_key,
+        p_start_date: start_date
     };
 
     if (isEditing) {
-        const { error } = await supabaseClient
-            .from(SUPABASE_TABLE)
-            .update(payload)
-            .eq('id', currentEditId);
-        if (error) alert('Error Updating: ' + error.message);
+        rpcPayload.p_id = parseInt(currentEditId);
+    }
+
+    const { error } = await supabaseClient.rpc('manage_banner_upsert', rpcPayload);
+
+    if (error) {
+        alert('Error: ' + error.message);
     } else {
-        const { error } = await supabaseClient
-            .from(SUPABASE_TABLE)
-            .insert([payload]);
-        if (error) alert('Error Adding: ' + error.message);
+        resetForm();
+        fetchBanners();
     }
-
-    bannerModal.style.display = 'none';
-    fetchBanners();
 });
-
-window.onclick = function (event) {
-    if (event.target == bannerModal) {
-        bannerModal.style.display = 'none';
-    }
-}
 
 function updateCheckboxListeners() {
     const checkboxes = document.querySelectorAll('.banner-checkbox');
@@ -326,17 +372,18 @@ if (btnDeleteSelected) {
         if (ids.length === 0) return;
 
         if (confirm(`Delete ${ids.length} selected banner(s)?`)) {
-            let errorCount = 0;
-            for (const id of ids) {
-                const { error } = await supabaseClient.from(SUPABASE_TABLE).delete().eq('id', id);
-                if (error) {
-                    console.error('Error deleting banner:', id, error);
-                    errorCount++;
-                }
-            }
+            const email = localStorage.getItem('admin_email');
+            const key = localStorage.getItem('admin_key');
 
-            if (errorCount > 0) {
-                alert(`Failed to delete ${errorCount} banner(s)`);
+            const { error } = await supabaseClient.rpc('manage_banner_delete', {
+                p_email: email,
+                p_key: key,
+                p_ids: ids.map(id => parseInt(id))
+            });
+
+            if (error) {
+                console.error('Error deleting banners:', error);
+                alert('Error deleting: ' + error.message);
             }
 
             fetchBanners();

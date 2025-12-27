@@ -42,26 +42,36 @@
     </div>
 
     <div id="dashboard-container" class="dashboard-container" style="display: none;">
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h3>Admin Panel</h3>
-            </div>
-            <ul class="nav-links">
-                <li class="active"><a href="#"><i class="fas fa-images"></i> Manage Banner</a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <button id="btn-logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
-        </nav>
+        <header class="dashboard-header">
+            <h1>ADMIN DASHBOARD</h1>
+            <button id="btn-logout" class="btn-logout">LOGOUT</button>
+        </header>
 
-        <main class="main-content">
-            <header>
-                <h1>Manage Banner</h1>
-                <div class="header-actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <div class="filters-row" style="display: flex; gap: 10px; flex-wrap: nowrap; align-items: center;">
-                        <select id="filter-nation"
-                            style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer;">
-                            <option value="all">ALL</option>
+        <main class="dashboard-main">
+            <section class="admin-card">
+                <div class="card-header">
+                    <h3>ADD NEW BANNER</h3>
+                    <i class="fas fa-chevron-up toggle-btn" id="toggle-banner-form"></i>
+                </div>
+                <form id="banner-form">
+                    <input type="hidden" id="banner-id">
+
+                    <div class="form-group">
+                        <label for="banner-title">TITLE</label>
+                        <input type="text" id="banner-title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-type">TYPE</label>
+                        <select id="banner-type">
+                            <option value="NATION">NATION</option>
+                            <option value="NEWS">NEWS</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-nation-key">REGION</label>
+                        <select id="banner-nation-key" required>
                             <option value="vietnam">VIETNAM</option>
                             <option value="brazil">BRAZIL</option>
                             <option value="india">INDIA</option>
@@ -70,30 +80,52 @@
                             <option value="singapore">SINGAPORE</option>
                             <option value="taiwan">TAIWAN</option>
                             <option value="thailand">THAILAND</option>
-                            <option value="news">NEWS</option>
                         </select>
-
-                        <div style="display: flex; gap: 10px; flex-wrap: nowrap;">
-                            <div style="display: flex; gap: 5px; align-items: center;">
-                                <label style="font-size: 0.9rem; white-space: nowrap;">FROM DATE:</label>
-                                <input type="text" id="filter-date-from" placeholder="DD/MM/YYYY"
-                                    style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 130px;">
-                            </div>
-
-                            <div style="display: flex; gap: 5px; align-items: center;">
-                                <label style="font-size: 0.9rem; white-space: nowrap;">TO DATE:</label>
-                                <input type="text" id="filter-date-to" placeholder="DD/MM/YYYY"
-                                    style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; width: 130px;">
-                            </div>
-                        </div>
-
-                        <button id="btn-add-banner" class="btn btn-success"><i class="fas fa-plus"></i> ADD</button>
-                        <button id="btn-delete-selected" class="btn"
-                            style="background-color: #dc3545; color: white; display: none;"><i
-                                class="fas fa-trash"></i>DELETE</button>
                     </div>
+
+                    <div class="form-group">
+                        <label for="banner-url">IMAGE URL</label>
+                        <input type="text" id="banner-url" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-start-date">START DATE / POSTING DATE</label>
+                        <input type="text" id="banner-start-date" placeholder="nn/mm/yyyy">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-link">LINK</label>
+                        <input type="text" id="banner-link">
+                    </div>
+
+                    <button type="submit" id="btn-save-banner" class="btn btn-primary-full">ADD BANNER</button>
+                </form>
+            </section>
+
+            <section class="filter-section">
+                <div class="filter-container">
+                    <span>FILTER BANNERS</span>
+                    <input type="text" id="filter-date-from" placeholder="nn/mm/yyyy">
+                    <input type="text" id="filter-date-to" placeholder="nn/mm/yyyy">
+                    <button id="btn-apply-filter" class="btn btn-info">APPLY FILTER</button>
+
+                    <select id="filter-nation" class="filter-select">
+                        <option value="all">ALL REGIONS</option>
+                        <option value="vietnam">VIETNAM</option>
+                        <option value="brazil">BRAZIL</option>
+                        <option value="india">INDIA</option>
+                        <option value="indonesia">INDONESIA</option>
+                        <option value="pakistan">PAKISTAN</option>
+                        <option value="singapore">SINGAPORE</option>
+                        <option value="taiwan">TAIWAN</option>
+                        <option value="thailand">THAILAND</option>
+                        <option value="news">NEWS</option>
+                    </select>
+
+                    <button id="btn-delete-selected" class="btn btn-danger" style="display: none;">DELETE
+                        SELECTED</button>
                 </div>
-            </header>
+            </section>
 
             <div class="banner-list-container">
                 <table class="data-table">
@@ -112,56 +144,6 @@
                 </table>
             </div>
         </main>
-    </div>
-
-    <div id="banner-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2 id="modal-title">ADD BANNER LANGUAGE</h2>
-            <form id="banner-form">
-                <input type="hidden" id="banner-id">
-
-                <div class="form-group">
-                    <label>REGION</label>
-                    <select id="banner-nation-key" required
-                        style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
-                        <option value="vietnam">VIETNAM</option>
-                        <option value="brazil">BRAZIL</option>
-                        <option value="india">INDIA</option>
-                        <option value="indonesia">INDONESIA</option>
-                        <option value="pakistan">PAKISTAN</option>
-                        <option value="singapore">SINGAPORE</option>
-                        <option value="taiwan">TAIWAN</option>
-                        <option value="thailand">THAILAND</option>
-                        <option value="news">NEWS</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>TITLE</label>
-                    <input type="text" id="banner-title">
-                </div>
-
-                <div class="form-group">
-                    <label>IMAGE URL</label>
-                    <input type="text" id="banner-url" required placeholder="https://...">
-                </div>
-
-                <div class="form-group">
-                    <label>LINK ACCESS</label>
-                    <input type="text" id="banner-link" placeholder="https://...">
-                </div>
-
-                <div class="form-group">
-                    <label>START DATE</label>
-                    <input type="text" id="banner-start-date" placeholder="00/00/0000">
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">SAVE</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <script src="/admin/app.js"></script>

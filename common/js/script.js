@@ -726,7 +726,6 @@ if (mobileLangSelector) {
                             overlayLink.style.display = 'none';
                         }
 
-                        // Download Button Logic
                         if (overlayDownload) {
                             if (isNews || !dateValue || dateValue.trim() === '') {
                                 overlayDownload.style.display = 'none';
@@ -902,7 +901,7 @@ window.addEventListener('load', () => {
     if (loadingScreen) {
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
-        }, 2000);
+        }, 1500);
     }
 });
 
