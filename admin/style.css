@@ -248,7 +248,8 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-color);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
@@ -283,6 +284,7 @@ body {
     border-radius: 6px;
     cursor: pointer;
     margin-right: 8px;
+    margin-bottom: 6px;
     font-size: 0.8rem;
     font-weight: 600;
     color: white;
@@ -385,5 +387,9 @@ body {
 
     .filter-select {
         margin-left: 0;
+    }
+
+    .data-table {
+        min-width: 800px;
     }
 }
