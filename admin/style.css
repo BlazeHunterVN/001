@@ -82,7 +82,7 @@ body {
 }
 
 .sidebar {
-    width: 260px;
+    width: 200px;
     background-color: var(--card-bg);
     border-right: 1px solid var(--border-color);
     padding: 20px 0;
@@ -95,7 +95,7 @@ body {
 }
 
 .sidebar.collapsed {
-    width: 70px;
+    width: 50px;
 }
 
 .sidebar.collapsed .tab-link {
@@ -509,6 +509,43 @@ body {
 
     .dashboard-header {
         padding: 10px 15px;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .sidebar {
+        width: 50px;
+        position: sticky;
+        top: 45px;
+        transform: none !important;
+        visibility: visible !important;
+        padding: 15px 0;
+    }
+
+    .sidebar .tab-link span {
+        display: none;
+    }
+
+    .sidebar .tab-link {
+        padding: 15px 0;
+        justify-content: center;
+        gap: 0;
+        border-left-width: 3px;
+    }
+
+    .sidebar .tab-link i {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .tab-content {
+        padding: 20px 15px;
     }
 
     .filter-container {

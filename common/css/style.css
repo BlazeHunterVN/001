@@ -237,6 +237,7 @@ ul {
     z-index: 1;
     transform: translate(-50%, -50%);
     object-fit: cover;
+    display: block;
 }
 
 #background-image-mobile {
@@ -831,6 +832,10 @@ body.hide-footer .footer {
     }
 
     #background-video {
+        display: none !important;
+    }
+
+    #background-image {
         display: none !important;
     }
 

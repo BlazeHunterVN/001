@@ -102,7 +102,9 @@ const languageLinks = document.querySelectorAll('.language-menu a');
 let navLinks = document.querySelectorAll('.nav-links a');
 
 const backgroundVideo = document.getElementById('background-video');
-const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+function getIsMobile() {
+    return window.matchMedia("(max-width: 768px)").matches;
+}
 
 let imageObserver = null;
 if ('IntersectionObserver' in window) {
@@ -265,42 +267,33 @@ async function fetchHomeSettings() {
 function applyHomeBackgrounds(settings) {
     if (!homeSection) return;
 
-    if (settings.bg_pc_url && !isMobileScreen) {
+    if (settings.bg_pc_url) {
         if (settings.bg_pc_url.match(/\.(mp4|webm|ogg)$/i)) {
             if (backgroundVideo) {
                 backgroundVideo.src = settings.bg_pc_url;
-                backgroundVideo.style.display = 'block';
-                if (userInteracted && homeSection.classList.contains('active')) {
+                if (userInteracted && homeSection.classList.contains('active') && !getIsMobile()) {
                     backgroundVideo.play().catch(() => { });
                 }
             }
-            if (backgroundImage) backgroundImage.style.display = 'none';
-            homeSection.style.backgroundImage = 'none';
+            if (backgroundImage) backgroundImage.src = '';
         } else {
             if (backgroundImage) {
                 backgroundImage.src = settings.bg_pc_url;
-                backgroundImage.style.display = 'block';
             }
             if (backgroundVideo) {
                 backgroundVideo.pause();
-                backgroundVideo.style.display = 'none';
+                backgroundVideo.src = '';
             }
-            homeSection.style.backgroundImage = 'none';
         }
     }
 
-    if (settings.bg_mobile_url && isMobileScreen) {
-        if (backgroundMobileImage) {
-            backgroundMobileImage.src = settings.bg_mobile_url;
-            backgroundMobileImage.style.display = 'block';
-        }
-        if (backgroundImage) backgroundImage.style.display = 'none';
-        homeSection.style.backgroundImage = 'none';
+    if (settings.bg_mobile_url && backgroundMobileImage) {
+        backgroundMobileImage.src = settings.bg_mobile_url;
     }
 }
 
 function tryToPlayVideo() {
-    if (backgroundVideo && homeSection && homeSection.classList.contains('active') && !isMobileScreen) {
+    if (backgroundVideo && homeSection && homeSection.classList.contains('active') && !getIsMobile()) {
         backgroundVideo.play().then(() => {
             userInteracted = true;
             document.removeEventListener('click', tryToPlayVideo);
@@ -312,7 +305,7 @@ function tryToPlayVideo() {
 }
 
 function stopVideo() {
-    if (backgroundVideo && !isMobileScreen) {
+    if (backgroundVideo && !getIsMobile()) {
         backgroundVideo.pause();
         backgroundVideo.currentTime = 0;
     }
@@ -538,7 +531,6 @@ function convertDateStringToDate(dateString) {
         }
     }
 
-    // Fallback to native parsing
     const parsed = new Date(dateString);
     if (!isNaN(parsed.getTime())) {
         return new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
