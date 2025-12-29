@@ -233,7 +233,9 @@ async function fetchDataFromAPI() {
             });
         });
 
-        await fetchHomeSettings();
+        if (settings) {
+            applyHomeBackgrounds(settings);
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
         const t = translations[currentLanguage];
@@ -247,38 +249,57 @@ async function fetchDataFromAPI() {
 }
 
 async function fetchHomeSettings() {
+    console.log("Starting fetchHomeSettings...");
+    const cachedPc = localStorage.getItem('home_bg_pc');
+    const cachedMobile = localStorage.getItem('home_bg_mobile');
+    if (cachedPc || cachedMobile) {
+        console.log("Applying from cache:", { cachedPc, cachedMobile });
+        applyHomeBackgrounds({ bg_pc_url: cachedPc, bg_mobile_url: cachedMobile });
+    }
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/home_settings?id=eq.1&select=*`, {
             headers: {
                 'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
             }
         });
-        if (!response.ok) throw new Error('Failed to fetch home settings');
-        const [settings] = await response.json();
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.log("Fetched home settings from DB:", data);
+
+        const settings = data[0];
         if (settings) {
             applyHomeBackgrounds(settings);
+            if (settings.bg_pc_url) localStorage.setItem('home_bg_pc', settings.bg_pc_url);
+            if (settings.bg_mobile_url) localStorage.setItem('home_bg_mobile', settings.bg_mobile_url);
         }
     } catch (error) {
-        console.error("Error fetching home settings:", error);
+        console.error("Error in fetchHomeSettings:", error);
     }
 }
 
 function applyHomeBackgrounds(settings) {
-    if (!homeSection) return;
+    if (!homeSection || !settings) return;
+    console.log("Applying backgrounds with settings:", settings);
 
-    if (settings.bg_pc_url) {
-        if (settings.bg_pc_url.match(/\.(mp4|webm|ogg)$/i)) {
+    const pcUrl = settings.bg_pc_url;
+    if (pcUrl && pcUrl.trim() !== '') {
+        console.log("Setting PC background to:", pcUrl);
+        if (pcUrl.match(/\.(mp4|webm|ogg)$/i)) {
             if (backgroundVideo) {
-                backgroundVideo.src = settings.bg_pc_url;
+                backgroundVideo.src = pcUrl;
                 if (userInteracted && homeSection.classList.contains('active') && !getIsMobile()) {
                     backgroundVideo.play().catch(() => { });
                 }
             }
-            if (backgroundImage) backgroundImage.src = '';
+            if (backgroundImage) backgroundImage.style.display = 'none';
         } else {
             if (backgroundImage) {
-                backgroundImage.src = settings.bg_pc_url;
+                backgroundImage.src = pcUrl;
+                backgroundImage.style.display = 'block';
             }
             if (backgroundVideo) {
                 backgroundVideo.pause();
@@ -287,8 +308,12 @@ function applyHomeBackgrounds(settings) {
         }
     }
 
-    if (settings.bg_mobile_url && backgroundMobileImage) {
-        backgroundMobileImage.src = settings.bg_mobile_url;
+    const mobileUrl = settings.bg_mobile_url;
+    if (mobileUrl && mobileUrl.trim() !== '') {
+        console.log("Setting Mobile background to:", mobileUrl);
+        if (backgroundMobileImage) {
+            backgroundMobileImage.src = mobileUrl;
+        }
     }
 }
 
@@ -1045,6 +1070,9 @@ document.addEventListener('click', function (e) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     applyTranslation(currentLanguage);
+
+    fetchHomeSettings();
+
     await fetchDataFromAPI();
     populateNationDropdown();
     attachAllNavLinkListeners();
