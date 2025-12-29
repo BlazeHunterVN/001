@@ -283,11 +283,14 @@ async function fetchHomeSettings() {
 
 function applyHomeBackgrounds(settings) {
     if (!homeSection || !settings) return;
-    console.log("Applying backgrounds with settings:", settings);
+    const timestamp = Date.now();
+    console.log("Applying backgrounds (Aggressive Mode)...");
 
     const pcUrl = settings.bg_pc_url;
     if (pcUrl && pcUrl.trim() !== '') {
-        console.log("Setting PC background to:", pcUrl);
+        const finalPcUrl = pcUrl.includes('?') ? `${pcUrl}&v=${timestamp}` : `${pcUrl}?v=${timestamp}`;
+        console.log("Setting PC background:", finalPcUrl);
+
         if (pcUrl.match(/\.(mp4|webm|ogg)$/i)) {
             if (backgroundVideo) {
                 backgroundVideo.src = pcUrl;
@@ -298,7 +301,7 @@ function applyHomeBackgrounds(settings) {
             if (backgroundImage) backgroundImage.style.display = 'none';
         } else {
             if (backgroundImage) {
-                backgroundImage.src = pcUrl;
+                backgroundImage.src = finalPcUrl;
                 backgroundImage.style.display = 'block';
             }
             if (backgroundVideo) {
@@ -310,9 +313,10 @@ function applyHomeBackgrounds(settings) {
 
     const mobileUrl = settings.bg_mobile_url;
     if (mobileUrl && mobileUrl.trim() !== '') {
-        console.log("Setting Mobile background to:", mobileUrl);
+        const finalMobileUrl = mobileUrl.includes('?') ? `${mobileUrl}&v=${timestamp}` : `${mobileUrl}?v=${timestamp}`;
+        console.log("Setting Mobile background:", finalMobileUrl);
         if (backgroundMobileImage) {
-            backgroundMobileImage.src = mobileUrl;
+            backgroundMobileImage.src = finalMobileUrl;
         }
     }
 }
