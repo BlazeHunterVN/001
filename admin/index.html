@@ -43,105 +43,156 @@
 
     <div id="dashboard-container" class="dashboard-container" style="display: none;">
         <header class="dashboard-header">
-            <h1>ADMIN DASHBOARD</h1>
+            <div class="header-left">
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>ADMIN DASHBOARD</h1>
+            </div>
             <button id="btn-logout" class="btn-logout">LOGOUT</button>
         </header>
 
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
         <main class="dashboard-main">
-            <section class="admin-card">
-                <div class="card-header">
-                    <h3>ADD NEW BANNER</h3>
-                    <i class="fas fa-chevron-up toggle-btn" id="toggle-banner-form"></i>
-                </div>
-                <form id="banner-form">
-                    <input type="hidden" id="banner-id">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <button class="tab-link active" data-tab="banners">
+                        <i class="fas fa-image"></i> <span>BANNER</span>
+                    </button>
+                    <button class="tab-link" data-tab="home-settings">
+                        <i class="fas fa-home"></i> <span>HOME SETTING</span>
+                    </button>
+                </nav>
+            </aside>
 
-                    <div class="form-group">
-                        <label for="banner-title">TITLE</label>
-                        <input type="text" id="banner-title">
+            <div class="tab-content">
+                <!-- Banner Management Tab -->
+                <section id="banners-tab" class="tab-pane active">
+                    <section class="admin-card">
+                        <div class="card-header">
+                            <h3>ADD NEW BANNER</h3>
+                            <i class="fas fa-chevron-up toggle-btn" id="toggle-banner-form"></i>
+                        </div>
+                        <form id="banner-form">
+                            <input type="hidden" id="banner-id">
+
+                            <div class="form-group">
+                                <label for="banner-title">TITLE</label>
+                                <input type="text" id="banner-title">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-type">TYPE</label>
+                                <select id="banner-type">
+                                    <option value="NATION">NATION</option>
+                                    <option value="NEWS">NEWS</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-nation-key">REGION</label>
+                                <select id="banner-nation-key" required>
+                                    <option value="vietnam">VIETNAM</option>
+                                    <option value="brazil">BRAZIL</option>
+                                    <option value="india">INDIA</option>
+                                    <option value="indonesia">INDONESIA</option>
+                                    <option value="pakistan">PAKISTAN</option>
+                                    <option value="singapore">SINGAPORE</option>
+                                    <option value="taiwan">TAIWAN</option>
+                                    <option value="thailand">THAILAND</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-url">IMAGE URL</label>
+                                <input type="text" id="banner-url" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-start-date">START DATE / POSTING DATE</label>
+                                <input type="text" id="banner-start-date" placeholder="nn/mm/yyyy">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-link">LINK</label>
+                                <input type="text" id="banner-link">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="banner-end-date">END DATE (AUTO +10 DAYS)</label>
+                                <input type="text" id="banner-end-date" placeholder="nn/mm/yyyy">
+                            </div>
+
+                            <button type="submit" id="btn-save-banner" class="btn btn-primary-full">ADD BANNER</button>
+                        </form>
+                    </section>
+
+                    <section class="filter-section">
+                        <div class="filter-container">
+                            <span>FILTER BANNERS</span>
+                            <input type="text" id="filter-date-from" placeholder="nn/mm/yyyy">
+                            <input type="text" id="filter-date-to" placeholder="nn/mm/yyyy">
+                            <button id="btn-apply-filter" class="btn btn-info">APPLY FILTER</button>
+
+                            <select id="filter-nation" class="filter-select">
+                                <option value="all">ALL REGIONS</option>
+                                <option value="vietnam">VIETNAM</option>
+                                <option value="brazil">BRAZIL</option>
+                                <option value="india">INDIA</option>
+                                <option value="indonesia">INDONESIA</option>
+                                <option value="pakistan">PAKISTAN</option>
+                                <option value="singapore">SINGAPORE</option>
+                                <option value="taiwan">TAIWAN</option>
+                                <option value="thailand">THAILAND</option>
+                                <option value="news">NEWS</option>
+                            </select>
+
+                            <button id="btn-delete-selected" class="btn btn-danger" style="display: none;">DELETE
+                                SELECTED</button>
+                        </div>
+                    </section>
+
+                    <div class="banner-list-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;"><input type="checkbox" id="select-all-checkbox"></th>
+                                    <th>IMAGE</th>
+                                    <th>TITLE</th>
+                                    <th>REGION</th>
+                                    <th>START DATE</th>
+                                    <th>END DATE</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="banner-table-body">
+                            </tbody>
+                        </table>
                     </div>
+                </section>
 
-                    <div class="form-group">
-                        <label for="banner-type">TYPE</label>
-                        <select id="banner-type">
-                            <option value="NATION">NATION</option>
-                            <option value="NEWS">NEWS</option>
-                        </select>
-                    </div>
+                <!-- Home Settings Tab -->
+                <section id="home-settings-tab" class="tab-pane">
+                    <section class="admin-card">
+                        <div class="card-header">
+                            <h3>HOME BACKGROUND MANAGEMENT</h3>
+                        </div>
+                        <form id="home-settings-form">
+                            <div class="form-group">
+                                <label for="home-bg-pc">PC BACKGROUND URL (IMAGE/VIDEO)</label>
+                                <input type="text" id="home-bg-pc" placeholder="https://...">
+                            </div>
 
-                    <div class="form-group">
-                        <label for="banner-nation-key">REGION</label>
-                        <select id="banner-nation-key" required>
-                            <option value="vietnam">VIETNAM</option>
-                            <option value="brazil">BRAZIL</option>
-                            <option value="india">INDIA</option>
-                            <option value="indonesia">INDONESIA</option>
-                            <option value="pakistan">PAKISTAN</option>
-                            <option value="singapore">SINGAPORE</option>
-                            <option value="taiwan">TAIWAN</option>
-                            <option value="thailand">THAILAND</option>
-                        </select>
-                    </div>
+                            <div class="form-group">
+                                <label for="home-bg-mobile">MOBILE BACKGROUND URL (IMAGE)</label>
+                                <input type="text" id="home-bg-mobile" placeholder="https://...">
+                            </div>
 
-                    <div class="form-group">
-                        <label for="banner-url">IMAGE URL</label>
-                        <input type="text" id="banner-url" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="banner-start-date">START DATE / POSTING DATE</label>
-                        <input type="text" id="banner-start-date" placeholder="nn/mm/yyyy">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="banner-link">LINK</label>
-                        <input type="text" id="banner-link">
-                    </div>
-
-                    <button type="submit" id="btn-save-banner" class="btn btn-primary-full">ADD BANNER</button>
-                </form>
-            </section>
-
-            <section class="filter-section">
-                <div class="filter-container">
-                    <span>FILTER BANNERS</span>
-                    <input type="text" id="filter-date-from" placeholder="nn/mm/yyyy">
-                    <input type="text" id="filter-date-to" placeholder="nn/mm/yyyy">
-                    <button id="btn-apply-filter" class="btn btn-info">APPLY FILTER</button>
-
-                    <select id="filter-nation" class="filter-select">
-                        <option value="all">ALL REGIONS</option>
-                        <option value="vietnam">VIETNAM</option>
-                        <option value="brazil">BRAZIL</option>
-                        <option value="india">INDIA</option>
-                        <option value="indonesia">INDONESIA</option>
-                        <option value="pakistan">PAKISTAN</option>
-                        <option value="singapore">SINGAPORE</option>
-                        <option value="taiwan">TAIWAN</option>
-                        <option value="thailand">THAILAND</option>
-                        <option value="news">NEWS</option>
-                    </select>
-
-                    <button id="btn-delete-selected" class="btn btn-danger" style="display: none;">DELETE
-                        SELECTED</button>
-                </div>
-            </section>
-
-            <div class="banner-list-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;"><input type="checkbox" id="select-all-checkbox"></th>
-                            <th>IMAGE</th>
-                            <th>TITLE</th>
-                            <th>REGION</th>
-                            <th>START DATE</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody id="banner-table-body">
-                    </tbody>
-                </table>
+                            <button type="submit" class="btn btn-primary-full">SAVE SETTINGS</button>
+                        </form>
+                    </section>
+                </section>
             </div>
         </main>
     </div>

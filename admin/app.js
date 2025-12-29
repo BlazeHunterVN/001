@@ -28,9 +28,54 @@ const btnDeleteSelected = document.getElementById('btn-delete-selected');
 
 const bannerType = document.getElementById('banner-type');
 const bannerNationKey = document.getElementById('banner-nation-key');
+const bannerEndDate = document.getElementById('banner-end-date');
 const toggleBannerForm = document.getElementById('toggle-banner-form');
 const adminCard = document.querySelector('.admin-card');
 const cardHeader = document.querySelector('.card-header');
+
+const tabLinks = document.querySelectorAll('.tab-link');
+const tabPanes = document.querySelectorAll('.tab-pane');
+const sidebar = document.querySelector('.sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+    });
+}
+
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-active');
+    });
+}
+
+if (window.innerWidth > 1024) {
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (isCollapsed) sidebar.classList.add('collapsed');
+}
+
+tabLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        const tabId = link.dataset.tab;
+
+        tabLinks.forEach(l => l.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+
+        link.classList.add('active');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+    });
+});
+
+const homeSettingsForm = document.getElementById('home-settings-form');
+const homeBgPc = document.getElementById('home-bg-pc');
+const homeBgMobile = document.getElementById('home-bg-mobile');
 
 async function checkSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -79,7 +124,6 @@ async function handleKeyLogin() {
         return;
     }
 
-    // Sử dụng RPC function để kiểm tra một cách bảo mật (không cần quyền Select trên bảng)
     const { data: isValid, error } = await supabaseClient.rpc('verify_admin_key', {
         p_email: email,
         p_key: key
@@ -112,7 +156,46 @@ function showLogin() {
 function showDashboard() {
     loginContainer.style.display = 'none';
     dashboardContainer.style.display = 'flex';
-    fetchBanners();
+    fetchBanners().then(() => {
+        autoCleanupBanners();
+    });
+    fetchHomeSettings();
+}
+
+async function autoCleanupBanners() {
+    if (allBanners.length === 0) return;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const expiredIds = allBanners.filter(banner => {
+        if (!banner.end_date) return false;
+        const end = parseDateString(banner.end_date);
+        if (!end) return false;
+
+        const diffTime = today.getTime() - end.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays > 30;
+    }).map(b => parseInt(b.id));
+
+    if (expiredIds.length > 0) {
+        console.log(`Auto-cleaning ${expiredIds.length} expired banners older than 30 days.`);
+        const email = localStorage.getItem('admin_email');
+        const key = localStorage.getItem('admin_key');
+
+        const { error } = await supabaseClient.rpc('manage_banner_delete', {
+            p_email: email,
+            p_key: key,
+            p_ids: expiredIds
+        });
+
+        if (!error) {
+            fetchBanners();
+        } else {
+            console.error('Auto-cleanup error:', error);
+        }
+    }
 }
 
 function showError(msg) {
@@ -172,7 +255,7 @@ function filterAndRender() {
     if (dateFrom || dateTo) {
         filtered = filtered.filter(b => {
             const bannerDate = parseDateString(b.start_date);
-            if (!bannerDate) return false; // Exclude banners without valid dates
+            if (!bannerDate) return false;
 
             if (dateFrom && bannerDate < dateFrom) return false;
             if (dateTo && bannerDate > dateTo) return false;
@@ -204,7 +287,7 @@ if (btnApplyFilter) {
 if (bannerType) {
     bannerType.addEventListener('change', () => {
         if (bannerType.value === 'NEWS') {
-            bannerNationKey.value = 'news'; // We keep 'news' internal for Supabase
+            bannerNationKey.value = 'news';
             bannerNationKey.disabled = true;
             bannerNationKey.required = false;
         } else {
@@ -231,8 +314,9 @@ function renderBanners(banners) {
             <td>${banner.title || 'No Title'}</td>
             <td><span class="badge badge-info">${banner.nation_key}</span></td>
             <td>${banner.start_date || '--/--/----'}</td>
+            <td>${banner.end_date || '--/--/----'}</td>
             <td>
-                <button class="action-btn btn-edit" onclick="openEditModal('${banner.id}', '${banner.title || ''}', '${banner.url}', '${banner.banner_link || ''}', '${banner.nation_key}', '${banner.start_date || ''}')"><i class="fas fa-edit"></i></button>
+                <button class="action-btn btn-edit" onclick="openEditModal('${banner.id}', '${banner.title || ''}', '${banner.url}', '${banner.banner_link || ''}', '${banner.nation_key}', '${banner.start_date || ''}', '${banner.end_date || ''}')"><i class="fas fa-edit"></i></button>
                 <button class="action-btn btn-delete" onclick="deleteBanner('${banner.id}')"><i class="fas fa-trash"></i></button>
             </td>
         `;
@@ -259,7 +343,7 @@ window.deleteBanner = async (id) => {
     }
 };
 
-window.openEditModal = (id, title, url, link, nation, startDate) => {
+window.openEditModal = (id, title, url, link, nation, startDate, endDate) => {
     isEditing = true;
     currentEditId = id;
     if (adminCardTitle) adminCardTitle.textContent = 'Edit Banner';
@@ -269,6 +353,7 @@ window.openEditModal = (id, title, url, link, nation, startDate) => {
     document.getElementById('banner-link').value = link;
     document.getElementById('banner-nation-key').value = nation;
     document.getElementById('banner-start-date').value = startDate;
+    document.getElementById('banner-end-date').value = endDate || '';
 
     if (nation === 'news') {
         bannerType.value = 'NEWS';
@@ -316,7 +401,8 @@ bannerForm.addEventListener('submit', async (e) => {
         p_url: url,
         p_banner_link: banner_link,
         p_nation_key: nation_key,
-        p_start_date: start_date
+        p_start_date: start_date,
+        p_end_date: document.getElementById('banner-end-date').value
     };
 
     if (isEditing) {
@@ -332,6 +418,50 @@ bannerForm.addEventListener('submit', async (e) => {
         fetchBanners();
     }
 });
+
+async function fetchHomeSettings() {
+    const { data, error } = await supabaseClient
+        .from('home_settings')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+    if (error) {
+        console.error('Error fetching home settings:', error);
+        return;
+    }
+
+    if (data) {
+        if (homeBgPc) homeBgPc.value = data.bg_pc_url || '';
+        if (homeBgMobile) homeBgMobile.value = data.bg_mobile_url || '';
+    }
+}
+
+if (homeSettingsForm) {
+    homeSettingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const pcUrl = homeBgPc.value.trim();
+        const mobileUrl = homeBgMobile.value.trim();
+
+        const email = localStorage.getItem('admin_email');
+        const key = localStorage.getItem('admin_key');
+
+        const { error } = await supabaseClient.rpc('manage_home_settings', {
+            p_email: email,
+            p_key: key,
+            p_bg_pc_url: pcUrl,
+            p_bg_mobile_url: mobileUrl
+        });
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            alert('Settings saved successfully!');
+            fetchHomeSettings();
+        }
+    });
+}
 
 function updateCheckboxListeners() {
     const checkboxes = document.querySelectorAll('.banner-checkbox');

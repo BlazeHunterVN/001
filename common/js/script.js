@@ -23,6 +23,7 @@ const translations = {
         'no_title': 'KHÔNG CÓ TIÊU ĐỀ',
         'active': 'ĐANG HOẠT ĐỘNG',
         'upcoming': 'SẮP DIỄN RA',
+        'ending': 'SẮP KẾT THÚC',
         'check_back': 'VUI LÒNG KIỂM TRA LẠI SAU.',
         'check_back_news': 'VUI LÒNG KIỂM TRA LẠI SAU ĐỂ CẬP NHẬT TIN TỨC MỚI NHẤT.',
         'download_image': 'TẢI ẢNH VỀ THIẾT BỊ'
@@ -47,6 +48,7 @@ const translations = {
         'no_title': 'NO TITLE',
         'active': 'ACTIVE',
         'upcoming': 'UPCOMING',
+        'ending': 'ENDING',
         'check_back': 'PLEASE CHECK BACK LATER.',
         'check_back_news': 'PLEASE CHECK BACK LATER FOR THE LATEST NEWS.',
         'download_image': 'DOWNLOAD IMAGE'
@@ -93,6 +95,8 @@ const nationDropdownLi = document.querySelector('.dropdown:not(.language-selecto
 
 const mobileLangSelector = document.getElementById('mobileLangSelector');
 const desktopLangSelector = document.getElementById('desktopLangSelector');
+const backgroundImage = document.getElementById('background-image');
+const backgroundMobileImage = document.getElementById('background-image-mobile');
 
 const languageLinks = document.querySelectorAll('.language-menu a');
 let navLinks = document.querySelectorAll('.nav-links a');
@@ -190,7 +194,8 @@ function changeLanguageAndReload(langKey) {
 }
 
 async function fetchDataFromAPI() {
-    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        console.error("Supabase config missing");
         return;
     }
 
@@ -221,10 +226,12 @@ async function fetchDataFromAPI() {
                 url: item.url,
                 startDate: item.start_date,
                 bannerLink: item.banner_link,
-                title: item.title
+                title: item.title,
+                endDate: item.end_date
             });
         });
 
+        await fetchHomeSettings();
     } catch (error) {
         console.error("Error fetching data:", error);
         const t = translations[currentLanguage];
@@ -234,6 +241,61 @@ async function fetchDataFromAPI() {
                 <p>${error.message || 'Unable to load content. Please try again later.'}</p>
             </div>`;
         }
+    }
+}
+
+async function fetchHomeSettings() {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/home_settings?id=eq.1&select=*`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch home settings');
+        const [settings] = await response.json();
+        if (settings) {
+            applyHomeBackgrounds(settings);
+        }
+    } catch (error) {
+        console.error("Error fetching home settings:", error);
+    }
+}
+
+function applyHomeBackgrounds(settings) {
+    if (!homeSection) return;
+
+    if (settings.bg_pc_url && !isMobileScreen) {
+        if (settings.bg_pc_url.match(/\.(mp4|webm|ogg)$/i)) {
+            if (backgroundVideo) {
+                backgroundVideo.src = settings.bg_pc_url;
+                backgroundVideo.style.display = 'block';
+                if (userInteracted && homeSection.classList.contains('active')) {
+                    backgroundVideo.play().catch(() => { });
+                }
+            }
+            if (backgroundImage) backgroundImage.style.display = 'none';
+            homeSection.style.backgroundImage = 'none';
+        } else {
+            if (backgroundImage) {
+                backgroundImage.src = settings.bg_pc_url;
+                backgroundImage.style.display = 'block';
+            }
+            if (backgroundVideo) {
+                backgroundVideo.pause();
+                backgroundVideo.style.display = 'none';
+            }
+            homeSection.style.backgroundImage = 'none';
+        }
+    }
+
+    if (settings.bg_mobile_url && isMobileScreen) {
+        if (backgroundMobileImage) {
+            backgroundMobileImage.src = settings.bg_mobile_url;
+            backgroundMobileImage.style.display = 'block';
+        }
+        if (backgroundImage) backgroundImage.style.display = 'none';
+        homeSection.style.backgroundImage = 'none';
     }
 }
 
@@ -416,16 +478,73 @@ function getEventStatus(startDateString) {
     }
 }
 
+function getBannerStatus(startDateStr, endDateStr) {
+    const t = translations[currentLanguage] || translations['default'] || {};
+    if (!startDateStr) return { status: 'none', label: '' };
+
+    const start = convertDateStringToDate(startDateStr);
+    let end;
+
+    if (endDateStr && endDateStr.trim() !== '') {
+        end = convertDateStringToDate(endDateStr);
+    } else {
+        end = new Date(start.getTime());
+        end.setUTCDate(end.getUTCDate() + 10);
+    }
+
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    start.setUTCHours(0, 0, 0, 0);
+    end.setUTCHours(0, 0, 0, 0);
+
+    if (today < start) {
+        return { status: 'upcoming', label: t['upcoming'] || 'UPCOMING', endDate: end };
+    }
+
+    const diffTimeSinceEnd = today.getTime() - end.getTime();
+    const diffDaysSinceEnd = Math.floor(diffTimeSinceEnd / (1000 * 60 * 60 * 24));
+
+    if (diffDaysSinceEnd >= 0) {
+        if (diffDaysSinceEnd > 30) {
+            return { status: 'none', label: '', endDate: end };
+        }
+        return { status: 'ending', label: t['ending'] || 'ENDING', endDate: end };
+    }
+
+    return { status: 'active', label: t['active'] || 'ACTIVE', endDate: end };
+}
+
 function convertDateStringToDate(dateString) {
-    if (!dateString) {
-        return new Date(0);
+    if (!dateString) return new Date(0);
+
+    const cleanStr = dateString.toString().split('T')[0].trim();
+    const parts = cleanStr.split(/[\/\-\.]/);
+
+    if (parts.length === 3) {
+        let day, month, year;
+        if (parts[0].length === 4) {
+            year = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10);
+            day = parseInt(parts[2], 10);
+        } else {
+            day = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10);
+            year = parseInt(parts[2], 10);
+        }
+
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+            return new Date(Date.UTC(year, month - 1, day));
+        }
     }
-    const parts = dateString.split('/');
-    if (parts.length !== 3) {
-        return new Date(0);
+
+    // Fallback to native parsing
+    const parsed = new Date(dateString);
+    if (!isNaN(parsed.getTime())) {
+        return new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
     }
-    const [day, month, year] = parts.map(Number);
-    return new Date(Date.UTC(year, month - 1, day));
+
+    return new Date(0);
 }
 
 function getOptimizedImageAttributes(imageDataUrl, altText) {
@@ -505,6 +624,30 @@ function displayImages(key, isNews = false) {
 
     targetGrid.removeAttribute('style');
 
+    images = images.filter(imageData => {
+        const { status } = getBannerStatus(imageData.startDate, imageData.endDate);
+        const start = convertDateStringToDate(imageData.startDate);
+        if (start.getTime() === 0) return true;
+
+        const now = new Date();
+        const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+        let end;
+        if (imageData.endDate && imageData.endDate.trim() !== '') {
+            end = convertDateStringToDate(imageData.endDate);
+        } else {
+            end = new Date(start.getTime());
+            end.setUTCDate(end.getUTCDate() + 10);
+        }
+        end.setUTCHours(0, 0, 0, 0);
+
+        const diffTimeSinceEnd = today.getTime() - end.getTime();
+        const diffDaysSinceEnd = Math.floor(diffTimeSinceEnd / (1000 * 60 * 60 * 24));
+
+        if (diffDaysSinceEnd > 30) return false;
+        return true;
+    });
+
     images.sort((a, b) => {
         const dateA = convertDateStringToDate(a.startDate);
         const dateB = convertDateStringToDate(b.startDate);
@@ -529,8 +672,9 @@ function displayImages(key, isNews = false) {
         gridItem.style.order = index;
 
         if (!isNews) {
-            const { status, label } = getEventStatus(imageData.startDate);
-            if (status !== 'none') {
+            const { status, label, endDate } = getBannerStatus(imageData.startDate, imageData.endDate);
+            if (status !== 'none' || label !== '') {
+                gridItem.classList.add(`${status}-status`);
                 const badgeElement = document.createElement('div');
                 badgeElement.classList.add('event-badge', `${status}-event`);
                 badgeElement.textContent = label;
@@ -707,10 +851,34 @@ if (mobileLangSelector) {
                         overlayTitle.textContent = data.title || t['no_title'];
 
                         const dateValue = data.startDate;
+                        const endDateFromDB = data.endDate;
 
                         if (dateValue && dateValue.trim() !== '') {
                             const dateLabel = isNews ? t['date_posting'] : t['start_date'];
-                            overlayDate.textContent = `${dateLabel}: ${dateValue}`;
+                            let dateText = `${dateLabel}: ${dateValue}`;
+
+                            if (!isNews) {
+                                let displayEndDate = "";
+                                if (endDateFromDB && endDateFromDB.trim() !== '') {
+                                    displayEndDate = endDateFromDB;
+                                } else {
+                                    const start = convertDateStringToDate(dateValue);
+                                    if (!isNaN(start.getTime())) {
+                                        const end = new Date(start);
+                                        end.setUTCDate(end.getUTCDate() + 10);
+                                        const day = String(end.getUTCDate()).padStart(2, '0');
+                                        const month = String(end.getUTCMonth() + 1).padStart(2, '0');
+                                        const year = end.getUTCFullYear();
+                                        displayEndDate = `${day}/${month}/${year}`;
+                                    }
+                                }
+
+                                if (displayEndDate) {
+                                    dateText += `<br>END DATE: ${displayEndDate}`;
+                                }
+                            }
+
+                            overlayDate.innerHTML = dateText;
                             overlayDate.style.display = 'block';
                         } else {
                             overlayDate.textContent = '';
@@ -751,7 +919,6 @@ if (mobileLangSelector) {
                                         })
                                         .catch(error => {
                                             console.error("Download failed:", error);
-                                            // Fallback to old method if fetch fails (CORS)
                                             const link = document.createElement('a');
                                             link.href = url;
                                             link.download = fileName;

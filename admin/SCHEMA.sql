@@ -13,7 +13,16 @@ create table public.nation_banners (
   url text not null,
   banner_link text,
   start_date text,
+  end_date text,
   nation_key text not null
+);
+
+-- 2. Create Home Settings Table
+create table public.home_settings (
+  id int primary key default 1,
+  bg_pc_url text,
+  bg_mobile_url text,
+  constraint check_id check (id = 1)
 );
 
 -- 2. Create Admin Access Table
@@ -26,6 +35,7 @@ create table public.admin_access (
 -- 3. Enable RLS
 alter table public.nation_banners enable row level security;
 alter table public.admin_access enable row level security;
+alter table public.home_settings enable row level security;
 
 -- 4. Policies for nation_banners
 -- Cho phép mọi người xem banner (dùng cho website công cộng)
@@ -47,6 +57,19 @@ with check (
 -- 5. Policies for admin_access
 create policy "Restrict read access to authenticated users" on public.admin_access for select using (auth.role() = 'authenticated');
 create policy "No public write access" on public.admin_access for all using (false);
+
+-- 6. Policies for home_settings
+create policy "Allow public read access" on public.home_settings for select using (true);
+create policy "Allow write for authenticated admins" on public.home_settings 
+for all 
+using (
+  auth.role() = 'authenticated' and 
+  exists (select 1 from public.admin_access where email = auth.email())
+)
+with check (
+  auth.role() = 'authenticated' and 
+  exists (select 1 from public.admin_access where email = auth.email())
+);
 
 -- 6. RPC Functions for Secure Banner Management
 -- Hàm xác thực cơ bản
@@ -74,7 +97,8 @@ create or replace function public.manage_banner_upsert(
     p_url text default null,
     p_banner_link text default null,
     p_nation_key text default null,
-    p_start_date text default null
+    p_start_date text default null,
+    p_end_date text default null
 )
 returns json
 language plpgsql
@@ -105,12 +129,13 @@ begin
             url = p_url,
             banner_link = p_banner_link,
             nation_key = p_nation_key,
-            start_date = p_start_date
+            start_date = p_start_date,
+            end_date = p_end_date
         where id = p_id;
         return json_build_object('status', 'updated', 'id', p_id);
     else
-        insert into public.nation_banners (title, url, banner_link, nation_key, start_date)
-        values (p_title, p_url, p_banner_link, p_nation_key, p_start_date)
+        insert into public.nation_banners (title, url, banner_link, nation_key, start_date, end_date)
+        values (p_title, p_url, p_banner_link, p_nation_key, p_start_date, p_end_date)
         returning id into p_id;
         return json_build_object('status', 'inserted', 'id', p_id);
     end if;
@@ -152,6 +177,49 @@ begin
 end;
 $$;
 
+-- Hàm Cập nhật Home Settings bảo mật
+create or replace function public.manage_home_settings(
+    p_email text,
+    p_key text,
+    p_bg_pc_url text,
+    p_bg_mobile_url text
+)
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_is_valid boolean;
+begin
+    -- 1. Kiểm tra quyền
+    v_is_valid := public.verify_admin_key(p_email, p_key);
+    
+    if not v_is_valid then
+        if auth.role() = 'authenticated' then
+            v_is_valid := exists (select 1 from public.admin_access where email = auth.email());
+        end if;
+    end if;
+
+    if not v_is_valid then
+        raise exception 'Unauthorized access';
+    end if;
+
+    -- 2. Cập nhật settings (Id luôn là 1)
+    insert into public.home_settings (id, bg_pc_url, bg_mobile_url)
+    values (1, p_bg_pc_url, p_bg_mobile_url)
+    on conflict (id) do update
+    set bg_pc_url = excluded.bg_pc_url,
+        bg_mobile_url = excluded.bg_mobile_url;
+    
+    return json_build_object('status', 'success');
+end;
+$$;
+
 -- Seed data
 insert into public.admin_access (email, access_key) values ('blazehunter01062008@gmail.com', 'Nguyenminhkhoi208160!')
 on conflict (email) do nothing;
+
+insert into public.home_settings (id, bg_pc_url, bg_mobile_url)
+values (1, '', '')
+on conflict (id) do nothing;

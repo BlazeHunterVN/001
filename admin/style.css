@@ -30,28 +30,149 @@ body {
 
 .dashboard-header {
     background-color: var(--card-bg);
-    padding: 15px 40px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #444;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.sidebar-toggle:hover {
+    background-color: #f0f4f8;
 }
 
 .dashboard-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #222;
+    letter-spacing: 0.5px;
 }
 
 .dashboard-main {
     flex: 1;
-    padding: 40px;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
     width: 100%;
+    display: flex;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 20px 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    transition: width 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+    z-index: 900;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar.collapsed .tab-link {
+    padding: 15px 20px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .tab-link span {
+    display: none;
+}
+
+.sidebar.collapsed .tab-link i {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    padding: 12px 25px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid transparent;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.tab-link i {
+    font-size: 1.1rem;
+    width: 20px;
+    color: #888;
+    flex-shrink: 0;
+}
+
+.tab-link:hover {
+    background-color: #f8fafc;
+    color: var(--primary-color);
+}
+
+.tab-link.active {
+    background-color: #e0f2fe;
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
+.tab-link.active i {
+    color: var(--primary-color);
+}
+
+.tab-content {
+    flex: 1;
+    padding: 30px 40px;
+    background-color: var(--bg-light);
+    overflow-y: auto;
+}
+
+.tab-pane {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tab-pane.active {
+    display: block;
 }
 
 .admin-card {
@@ -197,6 +318,16 @@ body {
 .badge-info {
     background-color: #e0f2fe;
     color: #0369a1;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
 }
 
 .filter-section {
@@ -373,11 +504,11 @@ body {
 
 @media (max-width: 768px) {
     .dashboard-main {
-        padding: 20px;
+        padding: 0;
     }
 
     .dashboard-header {
-        padding: 15px 20px;
+        padding: 10px 15px;
     }
 
     .filter-container {
