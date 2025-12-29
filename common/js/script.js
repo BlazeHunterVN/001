@@ -95,8 +95,6 @@ const nationDropdownLi = document.querySelector('.dropdown:not(.language-selecto
 
 const mobileLangSelector = document.getElementById('mobileLangSelector');
 const desktopLangSelector = document.getElementById('desktopLangSelector');
-const backgroundImage = document.getElementById('background-image');
-const backgroundMobileImage = document.getElementById('background-image-mobile');
 
 const languageLinks = document.querySelectorAll('.language-menu a');
 let navLinks = document.querySelectorAll('.nav-links a');
@@ -249,16 +247,17 @@ async function fetchDataFromAPI() {
 }
 
 async function fetchHomeSettings() {
-    console.log("Starting fetchHomeSettings...");
+    console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
+
     const cachedPc = localStorage.getItem('home_bg_pc');
     const cachedMobile = localStorage.getItem('home_bg_mobile');
     if (cachedPc || cachedMobile) {
-        console.log("Applying from cache:", { cachedPc, cachedMobile });
+        console.log("[Background-Engine] Cache found. Applying immediately.");
         applyHomeBackgrounds({ bg_pc_url: cachedPc, bg_mobile_url: cachedMobile });
     }
 
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/home_settings?id=eq.1&select=*`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/home_settings?select=*`, {
             headers: {
                 'apikey': SUPABASE_KEY,
                 'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -266,47 +265,62 @@ async function fetchHomeSettings() {
                 'Pragma': 'no-cache'
             }
         });
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log("Fetched home settings from DB:", data);
+        console.log("[Background-Engine] Data from DB:");
+        console.table(data);
 
         const settings = data[0];
         if (settings) {
             applyHomeBackgrounds(settings);
             if (settings.bg_pc_url) localStorage.setItem('home_bg_pc', settings.bg_pc_url);
             if (settings.bg_mobile_url) localStorage.setItem('home_bg_mobile', settings.bg_mobile_url);
+            console.log("[Background-Engine] Backgrounds updated and cached.");
+        } else {
+            console.warn("[Background-Engine] No settings found in database.");
         }
     } catch (error) {
-        console.error("Error in fetchHomeSettings:", error);
+        console.error("[Background-Engine] Sync Error:", error);
     }
 }
 
 function applyHomeBackgrounds(settings) {
-    if (!homeSection || !settings) return;
+    const section = document.getElementById('home-section');
+    const pcImg = document.getElementById('background-image');
+    const mobileImg = document.getElementById('background-image-mobile');
+    const video = document.getElementById('background-video');
+
+    if (!section || !settings) {
+        console.error("[Background-Engine] Required elements or settings missing:", { section, settings });
+        return;
+    }
+
     const timestamp = Date.now();
-    console.log("Applying backgrounds (Aggressive Mode)...");
+    console.log("[Background-Engine] Executing UI Update...");
 
     const pcUrl = settings.bg_pc_url;
     if (pcUrl && pcUrl.trim() !== '') {
         const finalPcUrl = pcUrl.includes('?') ? `${pcUrl}&v=${timestamp}` : `${pcUrl}?v=${timestamp}`;
-        console.log("Setting PC background:", finalPcUrl);
 
         if (pcUrl.match(/\.(mp4|webm|ogg)$/i)) {
-            if (backgroundVideo) {
-                backgroundVideo.src = pcUrl;
-                if (userInteracted && homeSection.classList.contains('active') && !getIsMobile()) {
-                    backgroundVideo.play().catch(() => { });
+            console.log("[Background-Engine] Applying PC VIDEO:", pcUrl);
+            if (video) {
+                video.src = pcUrl;
+                if (userInteracted && section.classList.contains('active') && !getIsMobile()) {
+                    video.play().catch(() => { });
                 }
             }
-            if (backgroundImage) backgroundImage.style.display = 'none';
+            if (pcImg) pcImg.style.display = 'none';
         } else {
-            if (backgroundImage) {
-                backgroundImage.src = finalPcUrl;
-                backgroundImage.style.display = 'block';
+            console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
+            if (pcImg) {
+                pcImg.src = finalPcUrl;
+                pcImg.style.display = 'block';
             }
-            if (backgroundVideo) {
-                backgroundVideo.pause();
-                backgroundVideo.src = '';
+            if (video) {
+                video.pause();
+                video.src = '';
             }
         }
     }
@@ -314,16 +328,18 @@ function applyHomeBackgrounds(settings) {
     const mobileUrl = settings.bg_mobile_url;
     if (mobileUrl && mobileUrl.trim() !== '') {
         const finalMobileUrl = mobileUrl.includes('?') ? `${mobileUrl}&v=${timestamp}` : `${mobileUrl}?v=${timestamp}`;
-        console.log("Setting Mobile background:", finalMobileUrl);
-        if (backgroundMobileImage) {
-            backgroundMobileImage.src = finalMobileUrl;
+        console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
+        if (mobileImg) {
+            mobileImg.src = finalMobileUrl;
         }
     }
 }
 
 function tryToPlayVideo() {
-    if (backgroundVideo && homeSection && homeSection.classList.contains('active') && !getIsMobile()) {
-        backgroundVideo.play().then(() => {
+    const video = document.getElementById('background-video');
+    const section = document.getElementById('home-section');
+    if (video && section && section.classList.contains('active') && !getIsMobile()) {
+        video.play().then(() => {
             userInteracted = true;
             document.removeEventListener('click', tryToPlayVideo);
             document.removeEventListener('touchend', tryToPlayVideo);
@@ -334,9 +350,10 @@ function tryToPlayVideo() {
 }
 
 function stopVideo() {
-    if (backgroundVideo && !getIsMobile()) {
-        backgroundVideo.pause();
-        backgroundVideo.currentTime = 0;
+    const video = document.getElementById('background-video');
+    if (video && !getIsMobile()) {
+        video.pause();
+        video.currentTime = 0;
     }
 }
 
