@@ -227,7 +227,8 @@ async function fetchDataFromAPI() {
                 startDate: item.start_date,
                 bannerLink: item.banner_link,
                 title: item.title,
-                endDate: item.end_date
+                endDate: item.end_date,
+                id: item.id
             });
         });
 
@@ -706,7 +707,7 @@ function displayImages(key, isNews = false) {
         const gridItem = document.createElement('div');
         gridItem.classList.add('grid-item');
         gridItem.dataset.key = key;
-        gridItem.dataset.index = index;
+        gridItem.dataset.id = imageData.id;
         gridItem.style.order = index;
 
         if (!isNews) {
@@ -876,8 +877,9 @@ if (mobileLangSelector) {
             const gridItem = e.target.closest('.grid-item');
             if (gridItem && !gridItem.classList.contains('updating-message')) {
                 const key = gridItem.dataset.key;
-                const index = parseInt(gridItem.dataset.index);
-                const data = nationData[key].images[index];
+                const id = parseInt(gridItem.dataset.id);
+
+                const data = nationData[key].images.find(img => img.id === id);
                 const isNews = key === 'news';
 
                 if (data) {
