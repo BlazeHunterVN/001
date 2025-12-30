@@ -322,7 +322,7 @@ function renderBanners(banners) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><input type="checkbox" class="banner-checkbox" data-id="${banner.id}"></td>
-            <td><img src="${banner.url}" alt="Banner" style="height: 50px; object-fit: cover;"></td>
+            <td><img src="${banner.url}" alt="Banner" style="height: 50px; object-fit: cover;" referrerpolicy="no-referrer"></td>
             <td>${banner.title || 'No Title'}</td>
             <td><span class="badge badge-info">${banner.nation_key}</span></td>
             <td>${banner.start_date || '--/--/----'}</td>
