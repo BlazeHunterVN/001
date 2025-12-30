@@ -319,10 +319,15 @@ if (cardHeader) {
 function renderBanners(banners) {
     bannerTableBody.innerHTML = '';
     banners.forEach(banner => {
+        let displayUrl = banner.url;
+        if (displayUrl && displayUrl.includes('dl-tata.freefireind.in')) {
+            displayUrl = `https://wsrv.nl/?url=${encodeURIComponent(banner.url)}`;
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><input type="checkbox" class="banner-checkbox" data-id="${banner.id}"></td>
-            <td><img src="${banner.url}" alt="Banner" style="height: 50px; object-fit: cover;" referrerpolicy="no-referrer"></td>
+            <td><img src="${displayUrl}" alt="Banner" style="height: 50px; object-fit: cover;" referrerpolicy="no-referrer" crossorigin="anonymous"></td>
             <td>${banner.title || 'No Title'}</td>
             <td><span class="badge badge-info">${banner.nation_key}</span></td>
             <td>${banner.start_date || '--/--/----'}</td>
