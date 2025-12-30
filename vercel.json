@@ -22,18 +22,6 @@
                     "value": "nosniff"
                 },
                 {
-                    "key": "Strict-Transport-Security",
-                    "value": "max-age=63072000; includeSubDomains; preload"
-                },
-                {
-                    "key": "Cross-Origin-Opener-Policy",
-                    "value": "same-origin"
-                },
-                {
-                    "key": "Cross-Origin-Resource-Policy",
-                    "value": "cross-origin"
-                },
-                {
                     "key": "X-Frame-Options",
                     "value": "DENY"
                 },
@@ -42,16 +30,20 @@
                     "value": "1; mode=block"
                 },
                 {
-                    "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://lscypgvlydfdhiulzbwu.supabase.co https://ik.imagekit.io https://dl-tata.freefireind.in; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; frame-ancestors 'none'; upgrade-insecure-requests;"
-                },
-                {
                     "key": "Referrer-Policy",
-                    "value": "no-referrer"
+                    "value": "strict-origin-when-cross-origin"
                 },
                 {
                     "key": "Permissions-Policy",
-                    "value": "camera=(), microphone=(), geolocation=()"
+                    "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+                },
+                {
+                    "key": "Content-Security-Policy",
+                    "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https://* http://*; font-src 'self' https://cdnjs.cloudflare.com data:; connect-src 'self' https://*.supabase.co;"
+                },
+                {
+                    "key": "Strict-Transport-Security",
+                    "value": "max-age=31536000; includeSubDomains; preload"
                 }
             ]
         },

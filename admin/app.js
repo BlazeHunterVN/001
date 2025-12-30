@@ -119,6 +119,15 @@ async function handleKeyLogin() {
     const email = emailInput.value.trim();
     const key = keyInput.value.trim();
 
+    // Basic anti-spam/brute force protection
+    const now = Date.now();
+    const lastAttempt = parseInt(localStorage.getItem('last_login_attempt') || '0');
+    if (now - lastAttempt < 2000) {
+        showError('Please Wait A Moment Before Trying Again!');
+        return;
+    }
+    localStorage.setItem('last_login_attempt', now.toString());
+
     if (!email || !key) {
         showError('Please Enter Email And Access Key!');
         return;
@@ -145,18 +154,6 @@ window.addEventListener('load', () => {
         showDashboard();
     } else {
         checkSession();
-    }
-
-    const togglePassword = document.getElementById('toggle-password');
-    const passwordInput = document.getElementById('access-key-input');
-
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
     }
 });
 
@@ -217,6 +214,16 @@ function showError(msg) {
 
 btnGoogleLogin.addEventListener('click', handleGoogleLogin);
 btnKeyLogin.addEventListener('click', handleKeyLogin);
+
+const togglePasswordBtn = document.getElementById('toggle-password');
+if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', function () {
+        const type = keyInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        keyInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+}
 
 btnLogout.addEventListener('click', async () => {
     await supabaseClient.auth.signOut();
@@ -319,15 +326,10 @@ if (cardHeader) {
 function renderBanners(banners) {
     bannerTableBody.innerHTML = '';
     banners.forEach(banner => {
-        let displayUrl = banner.url;
-        if (displayUrl && displayUrl.includes('dl-tata.freefireind.in')) {
-            displayUrl = `https://wsrv.nl/?url=${encodeURIComponent(banner.url)}`;
-        }
-
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><input type="checkbox" class="banner-checkbox" data-id="${banner.id}"></td>
-            <td><img src="${displayUrl}" alt="Banner" style="height: 50px; object-fit: cover;" referrerpolicy="no-referrer" crossorigin="anonymous"></td>
+            <td><img src="${banner.url}" alt="Banner" style="height: 50px; object-fit: cover;"></td>
             <td>${banner.title || 'No Title'}</td>
             <td><span class="badge badge-info">${banner.nation_key}</span></td>
             <td>${banner.start_date || '--/--/----'}</td>

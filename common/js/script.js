@@ -70,7 +70,6 @@ const initialNationData = {
     news: { images: [] },
 };
 const nationData = initialNationData;
-let homeSettings = null; // Global variable to store settings
 
 const IK_URL_ENDPOINT = "https://ik.imagekit.io/blazehunter/";
 
@@ -200,45 +199,6 @@ async function fetchDataFromAPI() {
         return;
     }
 
-    const CACHE_KEY = 'nation_data_cache_v2';
-    const CACHE_TIME_KEY = 'nation_data_time_v2';
-    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-    const processRawData = (data) => {
-        Object.keys(nationData).forEach(key => nationData[key].images = []);
-        data.forEach(item => {
-            const nationKey = item.nation_key;
-            if (!nationData[nationKey]) {
-                nationData[nationKey] = { images: [] };
-            }
-            nationData[nationKey].images.push({
-                url: item.url,
-                startDate: item.start_date,
-                bannerLink: item.banner_link,
-                title: item.title,
-                endDate: item.end_date,
-                id: item.id
-            });
-        });
-        if (homeSettings) {
-            applyHomeBackgrounds(homeSettings);
-        }
-    };
-
-    const now = Date.now();
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
-
-    if (cachedData && cachedTime && (now - parseInt(cachedTime) < CACHE_TTL)) {
-        // console.log("[Data-Sync] Serving from Cache (Fast Mode)");
-        try {
-            processRawData(JSON.parse(cachedData));
-            return;
-        } catch (e) {
-            console.warn("[Data-Sync] Cache corrupted, fetching fresh data.");
-        }
-    }
-
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*`, {
             headers: {
@@ -253,28 +213,30 @@ async function fetchDataFromAPI() {
 
         const rawData = await response.json();
 
-        // Save to cache
-        localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
-        localStorage.setItem(CACHE_TIME_KEY, now.toString());
-        // console.log("[Data-Sync] Data fetched and cached.");
+        Object.keys(nationData).forEach(key => nationData[key].images = []);
 
-        processRawData(rawData);
+        rawData.forEach(item => {
+            const nationKey = item.nation_key;
 
+            if (!nationData[nationKey]) {
+                nationData[nationKey] = { images: [] };
+            }
+
+            nationData[nationKey].images.push({
+                url: item.url,
+                startDate: item.start_date,
+                bannerLink: item.banner_link,
+                title: item.title,
+                endDate: item.end_date,
+                id: item.id
+            });
+        });
+
+        if (settings) {
+            applyHomeBackgrounds(settings);
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
-
-        // Fallback to stale cache
-        if (cachedData) {
-            console.warn("[Data-Sync] Network failed. Serving stale cache.");
-            try {
-                processRawData(JSON.parse(cachedData));
-                const t = translations[currentLanguage];
-                // Optional: Show a small toast notification that data might be old? 
-                // For now, silently serving is better than a crash.
-                return;
-            } catch (e) { }
-        }
-
         const t = translations[currentLanguage];
         if (imageGrid) {
             imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
@@ -286,12 +248,12 @@ async function fetchDataFromAPI() {
 }
 
 async function fetchHomeSettings() {
-    // console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
+    console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
 
     const cachedPc = localStorage.getItem('home_bg_pc');
     const cachedMobile = localStorage.getItem('home_bg_mobile');
     if (cachedPc || cachedMobile) {
-        // console.log("[Background-Engine] Cache found. Applying immediately.");
+        console.log("[Background-Engine] Cache found. Applying immediately.");
         applyHomeBackgrounds({ bg_pc_url: cachedPc, bg_mobile_url: cachedMobile });
     }
 
@@ -307,15 +269,15 @@ async function fetchHomeSettings() {
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        // console.log("[Background-Engine] Data from DB:");
-        // console.table(data);
+        console.log("[Background-Engine] Data from DB:");
+        console.table(data);
 
-        homeSettings = data[0];
-        if (homeSettings) {
-            applyHomeBackgrounds(homeSettings);
-            if (homeSettings.bg_pc_url) localStorage.setItem('home_bg_pc', homeSettings.bg_pc_url);
-            if (homeSettings.bg_mobile_url) localStorage.setItem('home_bg_mobile', homeSettings.bg_mobile_url);
-            // console.log("[Background-Engine] Backgrounds updated and cached.");
+        const settings = data[0];
+        if (settings) {
+            applyHomeBackgrounds(settings);
+            if (settings.bg_pc_url) localStorage.setItem('home_bg_pc', settings.bg_pc_url);
+            if (settings.bg_mobile_url) localStorage.setItem('home_bg_mobile', settings.bg_mobile_url);
+            console.log("[Background-Engine] Backgrounds updated and cached.");
         } else {
             console.warn("[Background-Engine] No settings found in database.");
         }
@@ -336,14 +298,14 @@ function applyHomeBackgrounds(settings) {
     }
 
     const timestamp = Date.now();
-    // console.log("[Background-Engine] Executing UI Update...");
+    console.log("[Background-Engine] Executing UI Update...");
 
     const pcUrl = settings.bg_pc_url;
     if (pcUrl && pcUrl.trim() !== '') {
         const finalPcUrl = pcUrl.includes('?') ? `${pcUrl}&v=${timestamp}` : `${pcUrl}?v=${timestamp}`;
 
         if (pcUrl.match(/\.(mp4|webm|ogg)$/i)) {
-            // console.log("[Background-Engine] Applying PC VIDEO:", pcUrl);
+            console.log("[Background-Engine] Applying PC VIDEO:", pcUrl);
             if (video) {
                 video.src = pcUrl;
                 if (userInteracted && section.classList.contains('active') && !getIsMobile()) {
@@ -352,7 +314,7 @@ function applyHomeBackgrounds(settings) {
             }
             if (pcImg) pcImg.style.display = 'none';
         } else {
-            // console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
+            console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
             if (pcImg) {
                 pcImg.src = finalPcUrl;
                 pcImg.style.display = 'block';
@@ -367,7 +329,7 @@ function applyHomeBackgrounds(settings) {
     const mobileUrl = settings.bg_mobile_url;
     if (mobileUrl && mobileUrl.trim() !== '') {
         const finalMobileUrl = mobileUrl.includes('?') ? `${mobileUrl}&v=${timestamp}` : `${mobileUrl}?v=${timestamp}`;
-        // console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
+        console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
         if (mobileImg) {
             mobileImg.src = finalMobileUrl;
         }
@@ -651,14 +613,6 @@ function getOptimizedImageAttributes(imageDataUrl, altText) {
         }
     }
 
-    if (imageDataUrl && imageDataUrl.includes('dl-tata.freefireind.in')) {
-        return {
-            src: `https://wsrv.nl/?url=${encodeURIComponent(imageDataUrl)}`,
-            alt: altText,
-            crossorigin: 'anonymous'
-        };
-    }
-
     return defaultAttributes;
 }
 
@@ -775,7 +729,6 @@ function displayImages(key, isNews = false) {
 
         imgElement.loading = 'lazy';
         imgElement.decoding = 'async';
-        imgElement.referrerPolicy = 'no-referrer';
 
         Object.assign(imgElement, finalAttributes);
 
@@ -992,14 +945,8 @@ if (mobileLangSelector) {
                                     const url = data.url;
                                     const fileName = url.substring(url.lastIndexOf('/') + 1) || 'image.jpg';
 
-                                    fetch(url, {
-                                        mode: 'cors',
-                                        credentials: 'omit'
-                                    })
-                                        .then(response => {
-                                            if (!response.ok) throw new Error('Network response was not ok');
-                                            return response.blob();
-                                        })
+                                    fetch(url)
+                                        .then(response => response.blob())
                                         .then(blob => {
                                             const blobUrl = window.URL.createObjectURL(blob);
                                             const link = document.createElement('a');
@@ -1012,10 +959,13 @@ if (mobileLangSelector) {
                                         })
                                         .catch(error => {
                                             console.error("Download failed:", error);
-                                            // Ensure we don't just open the link, but alert the user or try a direct force download
-                                            // The fallback of opening in new tab is creating the confusing UX. 
-                                            // We will try one more method: direct download attribute forcing (though limited support for cross-origin)
-                                            // If that fails, we can't do much else without a proxy, but the fetch usually works with proper CORS.
+                                            const link = document.createElement('a');
+                                            link.href = url;
+                                            link.download = fileName;
+                                            link.target = '_blank';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
                                         });
                                 };
                             }
