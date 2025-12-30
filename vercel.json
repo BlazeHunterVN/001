@@ -43,7 +43,7 @@
                 },
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: blob: https://ik.imagekit.io https://dl.dir.freefiremobile.com https://dl-tata.freefireind.in https://upload.wikimedia.org; connect-src 'self' https://lscypgvlydfdhiulzbwu.supabase.co https://ik.imagekit.io https://dl-tata.freefireind.in; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; frame-ancestors 'none'; upgrade-insecure-requests;"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://lscypgvlydfdhiulzbwu.supabase.co https://ik.imagekit.io https://dl-tata.freefireind.in; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; frame-ancestors 'none'; upgrade-insecure-requests;"
                 },
                 {
                     "key": "Referrer-Policy",

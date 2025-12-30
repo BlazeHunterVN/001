@@ -767,7 +767,7 @@ function displayImages(key, isNews = false) {
 
         imgElement.loading = 'lazy';
         imgElement.decoding = 'async';
-        imgElement.referrerPolicy = 'no-referrer'; // Try to bypass hotlink protection
+        imgElement.referrerPolicy = 'no-referrer';
 
         Object.assign(imgElement, finalAttributes);
 
