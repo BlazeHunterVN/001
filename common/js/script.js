@@ -230,7 +230,7 @@ async function fetchDataFromAPI() {
     const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
 
     if (cachedData && cachedTime && (now - parseInt(cachedTime) < CACHE_TTL)) {
-        console.log("[Data-Sync] Serving from Cache (Fast Mode)");
+        // console.log("[Data-Sync] Serving from Cache (Fast Mode)");
         try {
             processRawData(JSON.parse(cachedData));
             return;
@@ -256,7 +256,7 @@ async function fetchDataFromAPI() {
         // Save to cache
         localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
         localStorage.setItem(CACHE_TIME_KEY, now.toString());
-        console.log("[Data-Sync] Data fetched and cached.");
+        // console.log("[Data-Sync] Data fetched and cached.");
 
         processRawData(rawData);
 
@@ -286,12 +286,12 @@ async function fetchDataFromAPI() {
 }
 
 async function fetchHomeSettings() {
-    console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
+    // console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
 
     const cachedPc = localStorage.getItem('home_bg_pc');
     const cachedMobile = localStorage.getItem('home_bg_mobile');
     if (cachedPc || cachedMobile) {
-        console.log("[Background-Engine] Cache found. Applying immediately.");
+        // console.log("[Background-Engine] Cache found. Applying immediately.");
         applyHomeBackgrounds({ bg_pc_url: cachedPc, bg_mobile_url: cachedMobile });
     }
 
@@ -307,15 +307,15 @@ async function fetchHomeSettings() {
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log("[Background-Engine] Data from DB:");
-        console.table(data);
+        // console.log("[Background-Engine] Data from DB:");
+        // console.table(data);
 
         homeSettings = data[0];
         if (homeSettings) {
             applyHomeBackgrounds(homeSettings);
             if (homeSettings.bg_pc_url) localStorage.setItem('home_bg_pc', homeSettings.bg_pc_url);
             if (homeSettings.bg_mobile_url) localStorage.setItem('home_bg_mobile', homeSettings.bg_mobile_url);
-            console.log("[Background-Engine] Backgrounds updated and cached.");
+            // console.log("[Background-Engine] Backgrounds updated and cached.");
         } else {
             console.warn("[Background-Engine] No settings found in database.");
         }
@@ -336,14 +336,14 @@ function applyHomeBackgrounds(settings) {
     }
 
     const timestamp = Date.now();
-    console.log("[Background-Engine] Executing UI Update...");
+    // console.log("[Background-Engine] Executing UI Update...");
 
     const pcUrl = settings.bg_pc_url;
     if (pcUrl && pcUrl.trim() !== '') {
         const finalPcUrl = pcUrl.includes('?') ? `${pcUrl}&v=${timestamp}` : `${pcUrl}?v=${timestamp}`;
 
         if (pcUrl.match(/\.(mp4|webm|ogg)$/i)) {
-            console.log("[Background-Engine] Applying PC VIDEO:", pcUrl);
+            // console.log("[Background-Engine] Applying PC VIDEO:", pcUrl);
             if (video) {
                 video.src = pcUrl;
                 if (userInteracted && section.classList.contains('active') && !getIsMobile()) {
@@ -352,7 +352,7 @@ function applyHomeBackgrounds(settings) {
             }
             if (pcImg) pcImg.style.display = 'none';
         } else {
-            console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
+            // console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
             if (pcImg) {
                 pcImg.src = finalPcUrl;
                 pcImg.style.display = 'block';
@@ -367,7 +367,7 @@ function applyHomeBackgrounds(settings) {
     const mobileUrl = settings.bg_mobile_url;
     if (mobileUrl && mobileUrl.trim() !== '') {
         const finalMobileUrl = mobileUrl.includes('?') ? `${mobileUrl}&v=${timestamp}` : `${mobileUrl}?v=${timestamp}`;
-        console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
+        // console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
         if (mobileImg) {
             mobileImg.src = finalMobileUrl;
         }
@@ -983,8 +983,14 @@ if (mobileLangSelector) {
                                     const url = data.url;
                                     const fileName = url.substring(url.lastIndexOf('/') + 1) || 'image.jpg';
 
-                                    fetch(url)
-                                        .then(response => response.blob())
+                                    fetch(url, {
+                                        mode: 'cors',
+                                        credentials: 'omit'
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) throw new Error('Network response was not ok');
+                                            return response.blob();
+                                        })
                                         .then(blob => {
                                             const blobUrl = window.URL.createObjectURL(blob);
                                             const link = document.createElement('a');
@@ -997,13 +1003,10 @@ if (mobileLangSelector) {
                                         })
                                         .catch(error => {
                                             console.error("Download failed:", error);
-                                            const link = document.createElement('a');
-                                            link.href = url;
-                                            link.download = fileName;
-                                            link.target = '_blank';
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
+                                            // Ensure we don't just open the link, but alert the user or try a direct force download
+                                            // The fallback of opening in new tab is creating the confusing UX. 
+                                            // We will try one more method: direct download attribute forcing (though limited support for cross-origin)
+                                            // If that fails, we can't do much else without a proxy, but the fetch usually works with proper CORS.
                                         });
                                 };
                             }

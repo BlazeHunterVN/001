@@ -262,6 +262,12 @@ body {
     border-color: var(--primary-color);
 }
 
+/* Hide native password reveal icon in Edge/IE */
+.form-group input[type="password"]::-ms-reveal,
+.form-group input[type="password"]::-ms-clear {
+    display: none;
+}
+
 .btn {
     padding: 12px 25px;
     border: none;
@@ -439,7 +445,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(135deg, #00aeef 0%, #0072bc 100%);
+    background-image: linear-gradient(to right, #00f2fe -50%, #4facfe 100%);
 }
 
 .login-card {
