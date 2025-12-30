@@ -199,6 +199,45 @@ async function fetchDataFromAPI() {
         return;
     }
 
+    const CACHE_KEY = 'nation_data_cache_v2';
+    const CACHE_TIME_KEY = 'nation_data_time_v2';
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+    const processRawData = (data) => {
+        Object.keys(nationData).forEach(key => nationData[key].images = []);
+        data.forEach(item => {
+            const nationKey = item.nation_key;
+            if (!nationData[nationKey]) {
+                nationData[nationKey] = { images: [] };
+            }
+            nationData[nationKey].images.push({
+                url: item.url,
+                startDate: item.start_date,
+                bannerLink: item.banner_link,
+                title: item.title,
+                endDate: item.end_date,
+                id: item.id
+            });
+        });
+        if (settings) {
+            applyHomeBackgrounds(settings);
+        }
+    };
+
+    const now = Date.now();
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+
+    if (cachedData && cachedTime && (now - parseInt(cachedTime) < CACHE_TTL)) {
+        console.log("[Data-Sync] Serving from Cache (Fast Mode)");
+        try {
+            processRawData(JSON.parse(cachedData));
+            return;
+        } catch (e) {
+            console.warn("[Data-Sync] Cache corrupted, fetching fresh data.");
+        }
+    }
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*`, {
             headers: {
@@ -212,31 +251,29 @@ async function fetchDataFromAPI() {
         }
 
         const rawData = await response.json();
+        
+        // Save to cache
+        localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
+        localStorage.setItem(CACHE_TIME_KEY, now.toString());
+        console.log("[Data-Sync] Data fetched and cached.");
 
-        Object.keys(nationData).forEach(key => nationData[key].images = []);
+        processRawData(rawData);
 
-        rawData.forEach(item => {
-            const nationKey = item.nation_key;
-
-            if (!nationData[nationKey]) {
-                nationData[nationKey] = { images: [] };
-            }
-
-            nationData[nationKey].images.push({
-                url: item.url,
-                startDate: item.start_date,
-                bannerLink: item.banner_link,
-                title: item.title,
-                endDate: item.end_date,
-                id: item.id
-            });
-        });
-
-        if (settings) {
-            applyHomeBackgrounds(settings);
-        }
     } catch (error) {
         console.error("Error fetching data:", error);
+        
+        // Fallback to stale cache
+        if (cachedData) {
+            console.warn("[Data-Sync] Network failed. Serving stale cache.");
+            try {
+                processRawData(JSON.parse(cachedData));
+                const t = translations[currentLanguage];
+                // Optional: Show a small toast notification that data might be old? 
+                // For now, silently serving is better than a crash.
+                return;
+            } catch(e) {}
+        }
+
         const t = translations[currentLanguage];
         if (imageGrid) {
             imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
