@@ -70,6 +70,7 @@ const initialNationData = {
     news: { images: [] },
 };
 const nationData = initialNationData;
+let homeSettings = null; // Global variable to store settings
 
 const IK_URL_ENDPOINT = "https://ik.imagekit.io/blazehunter/";
 
@@ -219,8 +220,8 @@ async function fetchDataFromAPI() {
                 id: item.id
             });
         });
-        if (settings) {
-            applyHomeBackgrounds(settings);
+        if (homeSettings) {
+            applyHomeBackgrounds(homeSettings);
         }
     };
 
@@ -251,7 +252,7 @@ async function fetchDataFromAPI() {
         }
 
         const rawData = await response.json();
-        
+
         // Save to cache
         localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
         localStorage.setItem(CACHE_TIME_KEY, now.toString());
@@ -261,7 +262,7 @@ async function fetchDataFromAPI() {
 
     } catch (error) {
         console.error("Error fetching data:", error);
-        
+
         // Fallback to stale cache
         if (cachedData) {
             console.warn("[Data-Sync] Network failed. Serving stale cache.");
@@ -271,7 +272,7 @@ async function fetchDataFromAPI() {
                 // Optional: Show a small toast notification that data might be old? 
                 // For now, silently serving is better than a crash.
                 return;
-            } catch(e) {}
+            } catch (e) { }
         }
 
         const t = translations[currentLanguage];
@@ -309,11 +310,11 @@ async function fetchHomeSettings() {
         console.log("[Background-Engine] Data from DB:");
         console.table(data);
 
-        const settings = data[0];
-        if (settings) {
-            applyHomeBackgrounds(settings);
-            if (settings.bg_pc_url) localStorage.setItem('home_bg_pc', settings.bg_pc_url);
-            if (settings.bg_mobile_url) localStorage.setItem('home_bg_mobile', settings.bg_mobile_url);
+        homeSettings = data[0];
+        if (homeSettings) {
+            applyHomeBackgrounds(homeSettings);
+            if (homeSettings.bg_pc_url) localStorage.setItem('home_bg_pc', homeSettings.bg_pc_url);
+            if (homeSettings.bg_mobile_url) localStorage.setItem('home_bg_mobile', homeSettings.bg_mobile_url);
             console.log("[Background-Engine] Backgrounds updated and cached.");
         } else {
             console.warn("[Background-Engine] No settings found in database.");
