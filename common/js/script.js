@@ -651,6 +651,14 @@ function getOptimizedImageAttributes(imageDataUrl, altText) {
         }
     }
 
+    if (imageDataUrl && imageDataUrl.includes('dl-tata.freefireind.in')) {
+        return {
+            src: `https://wsrv.nl/?url=${encodeURIComponent(imageDataUrl)}`,
+            alt: altText,
+            crossorigin: 'anonymous'
+        };
+    }
+
     return defaultAttributes;
 }
 
