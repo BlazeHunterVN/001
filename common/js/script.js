@@ -953,22 +953,45 @@ if (mobileLangSelector) {
                                     const url = data.url;
                                     const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
 
-                                    // Use proxy API to bypass CORS
-                                    const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
+                                    const isLocalhost = window.location.hostname === 'localhost' ||
+                                        window.location.hostname === '127.0.0.1' ||
+                                        window.location.hostname.includes('192.168');
 
-                                    const link = document.createElement('a');
-                                    link.href = proxyUrl;
-                                    link.download = fileName;
-                                    link.style.display = 'none';
-                                    document.body.appendChild(link);
-                                    link.click();
+                                    try {
+                                        if (isLocalhost) {
+                                            // On localhost, try direct download (usually works)
+                                            const response = await fetch(url);
+                                            const blob = await response.blob();
+                                            const blobUrl = window.URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+                                            link.href = blobUrl;
+                                            link.download = fileName;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            window.URL.revokeObjectURL(blobUrl);
+                                        } else {
+                                            // On production, use proxy API
+                                            const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
+                                            const link = document.createElement('a');
+                                            link.href = proxyUrl;
+                                            link.download = fileName;
+                                            link.style.display = 'none';
+                                            document.body.appendChild(link);
+                                            link.click();
 
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
+                                            setTimeout(() => {
+                                                document.body.removeChild(link);
+                                            }, 100);
+                                        }
+                                    } catch (error) {
+                                        // Fallback: Open in new tab
+                                        window.open(url, '_blank');
+                                    } finally {
                                         overlayDownload.textContent = originalText;
                                         overlayDownload.style.pointerEvents = 'auto';
                                         overlayDownload.style.opacity = '1';
-                                    }, 100);
+                                    }
                                 };
                             }
                         }
