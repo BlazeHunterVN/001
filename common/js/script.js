@@ -971,26 +971,24 @@ if (mobileLangSelector) {
                                             document.body.removeChild(link);
                                             window.URL.revokeObjectURL(blobUrl);
                                         } else {
-                                            // On production, use proxy API with retry
+                                            // On production/mobile: "Nuclear Option"
+                                            // Direct navigation to the proxy URL
+                                            // The server headers (Content-Disposition: attachment) will force download
+                                            // preventing the page from actually changing context.
                                             const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
 
-                                            // Try to fetch through proxy
-                                            const response = await fetch(proxyUrl);
+                                            // Use location.assign which is cleaner than href for navigation
+                                            window.location.assign(proxyUrl);
 
-                                            if (response.ok) {
-                                                // Download via blob for better reliability
-                                                const blob = await response.blob();
-                                                const blobUrl = window.URL.createObjectURL(blob);
-                                                const link = document.createElement('a');
-                                                link.href = blobUrl;
-                                                link.download = fileName;
-                                                document.body.appendChild(link);
-                                                link.click();
-                                                document.body.removeChild(link);
-                                                window.URL.revokeObjectURL(blobUrl);
-                                            } else {
-                                                throw new Error(`API returned ${response.status}`);
-                                            }
+                                            // We remove the loading state after a short delay
+                                            // since the browser handles the rest
+                                            setTimeout(() => {
+                                                overlayDownload.textContent = originalText;
+                                                overlayDownload.style.pointerEvents = 'auto';
+                                                overlayDownload.style.opacity = '1';
+                                            }, 2000);
+
+                                            return; // Exit function early
                                         }
                                     } catch (error) {
                                         console.error('Download failed:', error);
