@@ -959,7 +959,7 @@ if (mobileLangSelector) {
 
                                     try {
                                         if (isLocalhost) {
-                                            // On localhost, try direct download (usually works)
+                                            // On localhost, try direct download
                                             const response = await fetch(url);
                                             const blob = await response.blob();
                                             const blobUrl = window.URL.createObjectURL(blob);
@@ -971,20 +971,29 @@ if (mobileLangSelector) {
                                             document.body.removeChild(link);
                                             window.URL.revokeObjectURL(blobUrl);
                                         } else {
-                                            // On production, use proxy API
+                                            // On production, use proxy API with retry
                                             const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
-                                            const link = document.createElement('a');
-                                            link.href = proxyUrl;
-                                            link.download = fileName;
-                                            link.style.display = 'none';
-                                            document.body.appendChild(link);
-                                            link.click();
 
-                                            setTimeout(() => {
+                                            // Try to fetch through proxy
+                                            const response = await fetch(proxyUrl);
+
+                                            if (response.ok) {
+                                                // Download via blob for better reliability
+                                                const blob = await response.blob();
+                                                const blobUrl = window.URL.createObjectURL(blob);
+                                                const link = document.createElement('a');
+                                                link.href = blobUrl;
+                                                link.download = fileName;
+                                                document.body.appendChild(link);
+                                                link.click();
                                                 document.body.removeChild(link);
-                                            }, 100);
+                                                window.URL.revokeObjectURL(blobUrl);
+                                            } else {
+                                                throw new Error(`API returned ${response.status}`);
+                                            }
                                         }
                                     } catch (error) {
+                                        console.error('Download failed:', error);
                                         // Fallback: Open in new tab
                                         window.open(url, '_blank');
                                     } finally {
