@@ -269,9 +269,6 @@ async function fetchHomeSettings() {
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log("[Background-Engine] Data from DB:");
-        console.table(data);
-
         const settings = data[0];
         if (settings) {
             applyHomeBackgrounds(settings);
@@ -317,6 +314,8 @@ function applyHomeBackgrounds(settings) {
             console.log("[Background-Engine] Applying PC IMAGE:", finalPcUrl);
             if (pcImg) {
                 pcImg.src = finalPcUrl;
+                pcImg.width = 1920;
+                pcImg.height = 1080;
                 pcImg.style.display = 'block';
             }
             if (video) {
@@ -332,6 +331,8 @@ function applyHomeBackgrounds(settings) {
         console.log("[Background-Engine] Applying MOBILE IMAGE:", finalMobileUrl);
         if (mobileImg) {
             mobileImg.src = finalMobileUrl;
+            mobileImg.width = 1080;
+            mobileImg.height = 1920;
         }
     }
 }
@@ -729,6 +730,8 @@ function displayImages(key, isNews = false) {
 
         imgElement.loading = 'lazy';
         imgElement.decoding = 'async';
+        imgElement.width = 600;
+        imgElement.height = 338;
 
         Object.assign(imgElement, finalAttributes);
 
@@ -940,33 +943,43 @@ if (mobileLangSelector) {
                             } else {
                                 overlayDownload.style.display = 'block';
                                 overlayDownload.textContent = t['download_image'];
-                                overlayDownload.onclick = (e) => {
+                                overlayDownload.onclick = async (e) => {
                                     e.preventDefault();
-                                    const url = data.url;
-                                    const fileName = url.substring(url.lastIndexOf('/') + 1) || 'image.jpg';
+                                    const originalText = overlayDownload.textContent;
+                                    overlayDownload.textContent = 'Downloading...';
+                                    overlayDownload.style.pointerEvents = 'none';
+                                    overlayDownload.style.opacity = '0.7';
 
-                                    fetch(url)
-                                        .then(response => response.blob())
-                                        .then(blob => {
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = blobUrl;
-                                            link.download = fileName;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(blobUrl);
-                                        })
-                                        .catch(error => {
-                                            console.error("Download failed:", error);
-                                            const link = document.createElement('a');
-                                            link.href = url;
-                                            link.download = fileName;
-                                            link.target = '_blank';
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        });
+                                    const url = data.url;
+                                    const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
+
+                                    try {
+                                        const response = await fetch(url, { mode: 'cors' });
+                                        if (!response.ok) throw new Error('Network response was not ok');
+                                        const blob = await response.blob();
+                                        const blobUrl = window.URL.createObjectURL(blob);
+                                        const link = document.createElement('a');
+                                        link.href = blobUrl;
+                                        link.download = fileName;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        window.URL.revokeObjectURL(blobUrl);
+                                    } catch (error) {
+                                        console.error("Download failed:", error);
+                                        // Fallback: Open in new tab
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.target = '_blank';
+                                        link.download = fileName;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    } finally {
+                                        overlayDownload.textContent = originalText;
+                                        overlayDownload.style.pointerEvents = 'auto';
+                                        overlayDownload.style.opacity = '1';
+                                    }
                                 };
                             }
                         }

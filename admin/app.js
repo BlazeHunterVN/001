@@ -305,6 +305,7 @@ if (btnApplyFilter) {
 
 if (bannerType) {
     bannerType.addEventListener('change', () => {
+        const newsOption = bannerNationKey.querySelector('option[value="news"]');
         if (bannerType.value === 'NEWS') {
             bannerNationKey.value = 'news';
             bannerNationKey.disabled = true;
@@ -312,6 +313,10 @@ if (bannerType) {
         } else {
             bannerNationKey.disabled = false;
             bannerNationKey.required = true;
+            if (newsOption) {
+                newsOption.disabled = true;
+                newsOption.title = "Only available for NEWS type";
+            }
             if (bannerNationKey.value === 'news') bannerNationKey.value = 'vietnam';
         }
     });
@@ -374,12 +379,18 @@ window.openEditModal = (id, title, url, link, nation, startDate, endDate) => {
     document.getElementById('banner-start-date').value = startDate;
     document.getElementById('banner-end-date').value = endDate || '';
 
-    if (nation === 'news') {
+    if (nation === 'news' || nation === 'NEWS') {
         bannerType.value = 'NEWS';
+        bannerNationKey.value = 'news';
         bannerNationKey.disabled = true;
     } else {
         bannerType.value = 'NATION';
         bannerNationKey.disabled = false;
+        const newsOption = bannerNationKey.querySelector('option[value="news"]');
+        if (newsOption) {
+            newsOption.disabled = true;
+            newsOption.title = "Only available for NEWS type";
+        }
     }
 
     const saveBtn = document.getElementById('btn-save-banner');
@@ -398,7 +409,14 @@ function resetForm() {
     bannerForm.reset();
     const saveBtn = document.getElementById('btn-save-banner');
     if (saveBtn) saveBtn.textContent = 'Add Banner';
-    if (bannerNationKey) bannerNationKey.disabled = false;
+    if (bannerNationKey) {
+        bannerNationKey.disabled = false;
+        const newsOption = bannerNationKey.querySelector('option[value="news"]');
+        if (newsOption) {
+            newsOption.disabled = false;
+            newsOption.title = "";
+        }
+    }
 }
 
 bannerForm.addEventListener('submit', async (e) => {
