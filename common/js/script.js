@@ -953,50 +953,22 @@ if (mobileLangSelector) {
                                     const url = data.url;
                                     const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
 
-                                    try {
-                                        // Try fetch with no-cors mode first
-                                        const response = await fetch(url, {
-                                            mode: 'no-cors',
-                                            credentials: 'omit'
-                                        });
+                                    // Use proxy API to bypass CORS
+                                    const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
 
-                                        const img = new Image();
-                                        img.crossOrigin = 'anonymous';
+                                    const link = document.createElement('a');
+                                    link.href = proxyUrl;
+                                    link.download = fileName;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
 
-                                        await new Promise((resolve, reject) => {
-                                            img.onload = resolve;
-                                            img.onerror = reject;
-                                            img.src = url;
-                                        });
-
-                                        const canvas = document.createElement('canvas');
-                                        canvas.width = img.naturalWidth;
-                                        canvas.height = img.naturalHeight;
-                                        const ctx = canvas.getContext('2d');
-                                        ctx.drawImage(img, 0, 0);
-
-                                        canvas.toBlob((blob) => {
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = blobUrl;
-                                            link.download = fileName;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(blobUrl);
-
-                                            overlayDownload.textContent = originalText;
-                                            overlayDownload.style.pointerEvents = 'auto';
-                                            overlayDownload.style.opacity = '1';
-                                        }, 'image/jpeg', 0.95);
-
-                                    } catch (error) {
-                                        window.open(url, '_blank');
-
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
                                         overlayDownload.textContent = originalText;
                                         overlayDownload.style.pointerEvents = 'auto';
                                         overlayDownload.style.opacity = '1';
-                                    }
+                                    }, 100);
                                 };
                             }
                         }
