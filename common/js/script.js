@@ -954,28 +954,45 @@ if (mobileLangSelector) {
                                     const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
 
                                     try {
-                                        const response = await fetch(url, { mode: 'cors' });
-                                        if (!response.ok) throw new Error('Network response was not ok');
-                                        const blob = await response.blob();
-                                        const blobUrl = window.URL.createObjectURL(blob);
-                                        const link = document.createElement('a');
-                                        link.href = blobUrl;
-                                        link.download = fileName;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                        window.URL.revokeObjectURL(blobUrl);
+                                        // Try fetch with no-cors mode first
+                                        const response = await fetch(url, {
+                                            mode: 'no-cors',
+                                            credentials: 'omit'
+                                        });
+
+                                        const img = new Image();
+                                        img.crossOrigin = 'anonymous';
+
+                                        await new Promise((resolve, reject) => {
+                                            img.onload = resolve;
+                                            img.onerror = reject;
+                                            img.src = url;
+                                        });
+
+                                        const canvas = document.createElement('canvas');
+                                        canvas.width = img.naturalWidth;
+                                        canvas.height = img.naturalHeight;
+                                        const ctx = canvas.getContext('2d');
+                                        ctx.drawImage(img, 0, 0);
+
+                                        canvas.toBlob((blob) => {
+                                            const blobUrl = window.URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+                                            link.href = blobUrl;
+                                            link.download = fileName;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            window.URL.revokeObjectURL(blobUrl);
+
+                                            overlayDownload.textContent = originalText;
+                                            overlayDownload.style.pointerEvents = 'auto';
+                                            overlayDownload.style.opacity = '1';
+                                        }, 'image/jpeg', 0.95);
+
                                     } catch (error) {
-                                        console.error("Download failed:", error);
-                                        // Fallback: Open in new tab
-                                        const link = document.createElement('a');
-                                        link.href = url;
-                                        link.target = '_blank';
-                                        link.download = fileName;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                    } finally {
+                                        window.open(url, '_blank');
+
                                         overlayDownload.textContent = originalText;
                                         overlayDownload.style.pointerEvents = 'auto';
                                         overlayDownload.style.opacity = '1';
