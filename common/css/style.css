@@ -213,6 +213,22 @@ ul {
     z-index: 10;
 }
 
+#nation-section,
+#news-section,
+#contact-section {
+    background-color: #f4f4f4;
+    background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+body.non-home-bg #nation-section.content-section.active,
+body.non-home-bg #news-section.content-section.active,
+body.non-home-bg #contact-section.content-section.active {
+    background-color: #f4f4f4 !important;
+    background-image: radial-gradient(#e0e0e0 1px, transparent 1px) !important;
+    background-size: 20px 20px !important;
+}
+
 #home-section {
     height: 100%;
     width: 100%;

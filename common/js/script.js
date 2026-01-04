@@ -193,11 +193,16 @@ function changeLanguageAndReload(langKey) {
     window.location.assign(window.location.pathname);
 }
 
-async function fetchDataFromAPI() {
+let isFetching = false;
+
+async function fetchDataFromAPI(silent = false) {
     if (!SUPABASE_URL || !SUPABASE_KEY) {
         console.error("Supabase config missing");
         return;
     }
+
+    if (isFetching) return;
+    isFetching = true;
 
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*`, {
@@ -213,16 +218,17 @@ async function fetchDataFromAPI() {
 
         const rawData = await response.json();
 
-        Object.keys(nationData).forEach(key => nationData[key].images = []);
+        // Prepare new data structure for comparison
+        const newNationData = JSON.parse(JSON.stringify(initialNationData)); // Reset structure
+        // But initialNationData is just the structure, we need to ensure keys exist
+        Object.keys(newNationData).forEach(key => newNationData[key].images = []);
 
         rawData.forEach(item => {
             const nationKey = item.nation_key;
-
-            if (!nationData[nationKey]) {
-                nationData[nationKey] = { images: [] };
+            if (!newNationData[nationKey]) {
+                newNationData[nationKey] = { images: [] };
             }
-
-            nationData[nationKey].images.push({
+            newNationData[nationKey].images.push({
                 url: item.url,
                 startDate: item.start_date,
                 bannerLink: item.banner_link,
@@ -232,20 +238,56 @@ async function fetchDataFromAPI() {
             });
         });
 
+        // Deep comparison to see if we need to update
+        const dataChanged = JSON.stringify(nationData) !== JSON.stringify(newNationData);
+
+        if (dataChanged) {
+            console.log("[Auto-Refresh] Data change detected. Updating UI...");
+
+            // Update the main data object
+            Object.keys(newNationData).forEach(key => {
+                nationData[key] = newNationData[key];
+            });
+
+            // Refresh current view if applicable
+            const currentPath = window.location.pathname;
+            const parts = currentPath.split('/');
+            const key = parts[parts.length - 1];
+
+            if (currentPath.startsWith('/nation/')) {
+                displayImages(key, false);
+            } else if (currentPath === '/nation') {
+                displayImages('default', false);
+            } else if (currentPath === '/news') {
+                displayImages('news', true);
+            }
+        } else {
+            if (!silent) console.log("[Auto-Refresh] No changes detected.");
+        }
+
         if (settings) {
             applyHomeBackgrounds(settings);
         }
     } catch (error) {
         console.error("Error fetching data:", error);
-        const t = translations[currentLanguage];
-        if (imageGrid) {
-            imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
-                <h2>⚠️ Connection Error</h2>
-                <p>${error.message || 'Unable to load content. Please try again later.'}</p>
-            </div>`;
+        if (!silent) {
+            const t = translations[currentLanguage];
+            if (imageGrid) {
+                imageGrid.innerHTML = `<div style="text-align: center; padding: 50px; color: #d32f2f;">
+                    <h2>⚠️ Connection Error</h2>
+                    <p>${error.message || 'Unable to load content. Please try again later.'}</p>
+                </div>`;
+            }
         }
+    } finally {
+        isFetching = false;
     }
 }
+
+// Polling interval (e.g., every 10 seconds)
+setInterval(() => {
+    fetchDataFromAPI(true);
+}, 10000);
 
 async function fetchHomeSettings() {
     console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
