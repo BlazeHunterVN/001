@@ -194,6 +194,7 @@ function changeLanguageAndReload(langKey) {
 }
 
 let isFetching = false;
+let lastDataHash = '';
 
 async function fetchDataFromAPI(silent = false) {
     if (!SUPABASE_URL || !SUPABASE_KEY) {
@@ -218,9 +219,7 @@ async function fetchDataFromAPI(silent = false) {
 
         const rawData = await response.json();
 
-        // Prepare new data structure for comparison
-        const newNationData = JSON.parse(JSON.stringify(initialNationData)); // Reset structure
-        // But initialNationData is just the structure, we need to ensure keys exist
+        const newNationData = JSON.parse(JSON.stringify(initialNationData));
         Object.keys(newNationData).forEach(key => newNationData[key].images = []);
 
         rawData.forEach(item => {
@@ -238,18 +237,23 @@ async function fetchDataFromAPI(silent = false) {
             });
         });
 
-        // Deep comparison to see if we need to update
-        const dataChanged = JSON.stringify(nationData) !== JSON.stringify(newNationData);
+        const newDataHash = JSON.stringify(newNationData);
+        const dataChanged = lastDataHash !== '' && lastDataHash !== newDataHash;
 
-        if (dataChanged) {
-            console.log("[Auto-Refresh] Data change detected. Updating UI...");
+        if (lastDataHash === '') {
+            if (!silent) console.log("[Auto-Refresh] Initial data loaded.");
+            lastDataHash = newDataHash;
 
-            // Update the main data object
             Object.keys(newNationData).forEach(key => {
                 nationData[key] = newNationData[key];
             });
+        } else if (dataChanged) {
+            console.log("%c[Auto-Refresh] 🔄 Data change detected! Updating UI...", "color: #ff9800; font-weight: bold;");
+            lastDataHash = newDataHash;
 
-            // Refresh current view if applicable
+            Object.keys(newNationData).forEach(key => {
+                nationData[key] = newNationData[key];
+            });
             const currentPath = window.location.pathname;
             const parts = currentPath.split('/');
             const key = parts[parts.length - 1];
@@ -261,6 +265,8 @@ async function fetchDataFromAPI(silent = false) {
             } else if (currentPath === '/news') {
                 displayImages('news', true);
             }
+
+            console.log("%c[Auto-Refresh] ✅ UI updated successfully!", "color: #4caf50; font-weight: bold;");
         } else {
             if (!silent) console.log("[Auto-Refresh] No changes detected.");
         }
@@ -284,7 +290,7 @@ async function fetchDataFromAPI(silent = false) {
     }
 }
 
-// Polling interval (e.g., every 10 seconds)
+console.log("%c[Auto-Refresh] 🔄 Polling started. Checking for updates every 10 seconds...", "color: #2196f3; font-weight: bold;");
 setInterval(() => {
     fetchDataFromAPI(true);
 }, 10000);
@@ -1013,28 +1019,21 @@ if (mobileLangSelector) {
                                             document.body.removeChild(link);
                                             window.URL.revokeObjectURL(blobUrl);
                                         } else {
-                                            // On production/mobile: "Nuclear Option"
-                                            // Direct navigation to the proxy URL
-                                            // The server headers (Content-Disposition: attachment) will force download
-                                            // preventing the page from actually changing context.
                                             const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
 
-                                            // Use location.assign which is cleaner than href for navigation
                                             window.location.assign(proxyUrl);
 
-                                            // We remove the loading state after a short delay
-                                            // since the browser handles the rest
                                             setTimeout(() => {
                                                 overlayDownload.textContent = originalText;
                                                 overlayDownload.style.pointerEvents = 'auto';
                                                 overlayDownload.style.opacity = '1';
                                             }, 2000);
 
-                                            return; // Exit function early
+                                            return;
                                         }
+
                                     } catch (error) {
                                         console.error('Download failed:', error);
-                                        // Fallback: Open in new tab
                                         window.open(url, '_blank');
                                     } finally {
                                         overlayDownload.textContent = originalText;
