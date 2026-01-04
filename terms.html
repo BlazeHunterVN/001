@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều Khoản Sử Dụng - Zone Posters</title>
+    <link rel="icon" type="image/png" href="/common/image/LOGO_FF_SHORT.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Exo-SemiBold';
+            src: url('/common/fonts/Exo-SemiBold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #4a4a4a;
+            --accent-color: #ffba00;
+            --bg-color: #f4f4f4;
+            --paper-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --container-width: 900px;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-wrapper {
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .document-container {
+            max-width: var(--container-width);
+            width: 100%;
+            background: var(--paper-color);
+            padding: 80px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            position: relative;
+            border-top: 5px solid var(--accent-color);
+        }
+
+        .document-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background-image: url('/common/image/LOGO_FF_SHORT.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Exo-SemiBold', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .meta-info {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #777;
+            margin-bottom: 60px;
+            font-style: italic;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-family: 'Exo-SemiBold', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-top: 50px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 24px;
+            background-color: var(--accent-color);
+            margin-right: 12px;
+            border-radius: 2px;
+            transform: translateY(1px);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: 35px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        ul {
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            border-bottom: 1px dotted transparent;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        a:hover {
+            color: #004499;
+            border-bottom: 1px solid #004499;
+        }
+
+        .warning-box {
+            background-color: #fff9e6;
+            border-left: 4px solid #ffba00;
+            color: #856404;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .contact-card {
+            background-color: #fafafa;
+            border: 1px solid #eeeeee;
+            border-left: 4px solid var(--primary-color);
+            padding: 30px;
+            margin-top: 60px;
+            border-radius: 4px;
+        }
+
+        .contact-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-family: 'Exo-SemiBold', sans-serif;
+        }
+
+        .footer-action {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .legal-notice {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-home:hover {
+            background-color: var(--accent-color);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 186, 0, 0.4);
+            border-bottom: none;
+            text-decoration: none;
+        }
+
+        .btn-home span {
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding: 0;
+            }
+
+            .document-container {
+                padding: 30px 20px;
+                box-shadow: none;
+                border-radius: 0;
+                border-top: none;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+                margin-top: 30px;
+                margin-bottom: 20px;
+            }
+
+            h2::before {
+                width: 4px;
+                height: 20px;
+                margin-right: 8px;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+                margin-top: 25px;
+            }
+
+            .meta-info {
+                width: 100%;
+                font-size: 0.85rem;
+                margin-bottom: 30px;
+            }
+
+            p,
+            li {
+                font-size: 0.95rem;
+            }
+
+            .contact-card {
+                padding: 20px;
+                margin-top: 40px;
+            }
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+
+            .document-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .btn-home {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+        <div class="document-container">
+            <div class="content-wrapper">
+                <h1>Điều Khoản Sử Dụng</h1>
+
+                <div class="meta-info">
+                    Phiên bản: 2.0.1 &nbsp;|&nbsp; Ngày cập nhật: 04/01/2026
+                </div>
+
+                <p style="font-size: 1.1rem; text-align: center; margin-bottom: 40px;">Chào mừng bạn đến với
+                    <strong>Zone Posters</strong>. Các quy định dưới đây thiết lập một thỏa thuận pháp lý ràng buộc giữa
+                    Người dùng và Ban quản trị Zone Posters.
+                </p>
+
+                <h2>1. Định Nghĩa Và Phạm Vi</h2>
+                <p><strong>1.1. Dịch vụ:</strong> Bao gồm việc truy cập, xem, tải xuống hoặc mua các thiết kế poster
+                    trên website <a href="https://zoneposters.vercel.app/"
+                        target="_blank">https://zoneposters.vercel.app/</a>.</p>
+                <p><strong>1.2. Nội dung:</strong> Tất cả hình ảnh, đồ họa, biểu ngữ (banners), và mã nguồn được hiển
+                    thị.</p>
+
+                <h2>2. Quy Định Về Nội Dung Liên Kết Đến Garena Free Fire</h2>
+                <p>Website Zone Posters có cung cấp các thiết kế liên quan đến trò chơi Garena Free Fire. Các bên cùng
+                    xác nhận các điều khoản pháp lý sau:</p>
+
+                <h3>2.1. Sở hữu thương hiệu</h3>
+                <p>Zone Posters xác nhận rằng các nhãn hiệu "Garena", "Free Fire", logo, nhân vật và hình ảnh gốc trong
+                    trò chơi thuộc bản quyền và sở hữu trí tuệ của <strong>Garena Online Private Limited</strong>.</p>
+
+                <h3>2.2. Ủy quyền phái sinh</h3>
+                <p>Các sản phẩm poster tại website này là tác phẩm đồ họa phái sinh do Zone Posters thực hiện. Bạn chỉ
+                    được phép sử dụng các nội dung này cho mục đích cá nhân, phi thương mại.</p>
+
+                <h3>2.3. Giới hạn trách nhiệm</h3>
+                <p>Zone Posters không đại diện cho Garena. Chúng tôi không chịu trách nhiệm nếu Garena yêu cầu gỡ bỏ
+                    hoặc thay đổi các nội dung liên quan đến hình ảnh của họ trên thiết bị của bạn.</p>
+
+                <div class="warning-box">
+                    <strong>2.4. Nghiêm cấm:</strong> Tuyệt đối không sử dụng các biểu ngữ, poster Free Fire từ website
+                    này để quảng bá cho các dịch vụ vi phạm điều khoản của Garena (như hack/mod game, lừa đảo kim cương
+                    hoặc các trang web cá cược).
+                </div>
+
+                <h2>3. Ủy Quyền Sử Dụng Và Bản Quyền</h2>
+                <p><strong>3.1. Giấy phép hạn chế:</strong> Khi bạn truy cập, chúng tôi cấp cho bạn giấy phép không độc
+                    quyền, không thể chuyển nhượng để xem và sử dụng nội dung theo đúng mục đích của website.</p>
+                <p><strong>3.2. Quyền tác giả:</strong> Zone Posters giữ quyền tác giả đối với cách sắp xếp, phối màu và
+                    các chi tiết đồ họa tự thiết kế. Mọi hành vi xóa "Watermark" hoặc thông tin bản quyền trên poster là
+                    vi phạm điều khoản.</p>
+                <p><strong>3.3. Ủy quyền bên thứ ba:</strong> Đối với các tài nguyên (assets) từ bên thứ ba (như font
+                    chữ, icon), chúng tôi cam kết sử dụng theo đúng giấy phép (Open Source hoặc Commercial License) mà
+                    bên cung cấp quy định.</p>
+
+                <h2>4. Trách Nhiệm Pháp Lý Giữa Các Bên</h2>
+                <h3>4.1. Trách nhiệm của Người dùng:</h3>
+                <ul>
+                    <li>Đảm bảo các thông tin cung cấp khi sử dụng dịch vụ là chính xác.</li>
+                    <li>Chịu hoàn toàn trách nhiệm pháp lý nếu sử dụng poster của chúng tôi vào các mục đích vi phạm
+                        pháp luật nước sở tại.</li>
+                </ul>
+
+                <h3>4.2. Trách nhiệm của Zone Posters:</h3>
+                <ul>
+                    <li>Bảo mật thông tin người dùng theo quy chuẩn của nền tảng Vercel.</li>
+                    <li>Hỗ trợ giải quyết các vấn đề kỹ thuật liên quan đến việc hiển thị và tải nội dung.</li>
+                </ul>
+
+                <h3>4.3. Bất khả kháng:</h3>
+                <p>Chúng tôi không chịu trách nhiệm trong trường hợp gián đoạn dịch vụ do các yếu tố hạ tầng (Vercel,
+                    Cloudflare) hoặc các sự kiện pháp lý ngoài tầm kiểm soát.</p>
+
+                <h2>5. Quy Định Về Chấm Dứt Và Xử Lý Vi Phạm</h2>
+                <ul>
+                    <li><strong>5.1.</strong> Zone Posters có quyền chặn truy cập (IP/Account) đối với các đối tượng có
+                        hành vi tấn công từ chối dịch vụ (DDoS) hoặc thu thập dữ liệu trái phép (Scraping).</li>
+                    <li><strong>5.2.</strong> Mọi tranh chấp phát sinh sẽ được ưu tiên giải quyết thông qua thương
+                        lượng. Nếu không đạt được thỏa thuận, tranh chấp sẽ được phân xử theo pháp luật hiện hành tại
+                        Việt Nam.</li>
+                </ul>
+
+                <div class="contact-card">
+                    <h3>6. Thông Tin Liên Hệ</h3>
+                    <p>Nếu có bất kỳ câu hỏi nào về vấn đề bản quyền hoặc ủy quyền sử dụng liên quan đến Garena Free
+                        Fire, vui lòng liên hệ</p>
+                    <p><strong>Quản trị viên:</strong> Nguyễn Minh Khôi<br>
+                        <strong>Email:</strong> <a
+                            href="mailto:blazehunter01062008@gmail.com">blazehunter01062008@gmail.com</a>
+                    </p>
+                </div>
+
+                <div class="legal-notice">
+                    Bản điều khoản này đóng vai trò là bằng chứng pháp lý khi có khiếu nại về bản quyền xảy ra giữa
+                    người dùng và nền tảng.
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <a href="/" class="btn-home">
+                    <i class="fas fa-arrow-left"></i> <span>Quay lại Trang chủ</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</body>
+
+</html>

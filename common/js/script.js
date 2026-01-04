@@ -12,7 +12,7 @@ const translations = {
         'news_heading': 'TIN TỨC',
         'contact_heading': 'LIÊN HỆ VỚI CHÚNG TÔI',
         'contact_info': 'THÔNG TIN LIÊN HỆ Ở ĐÂY.',
-        'operating_policy': 'CHÍNH SÁCH VẬN HÀNH',
+        'operating_policy': 'CHÍNH SÁCH HOẠT ĐỘNG',
         'terms_of_use': 'ĐIỀU KHOẢN SỬ DỤNG',
         'select_prompt': 'VUI LÒNG CHỌN MỘT QUỐC GIA',
         'update_banner': 'DỮ LIỆU BIỂU NGỮ ĐANG ĐƯỢC CẬP NHẬT.',

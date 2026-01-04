@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chính Sách Hoạt Động - Zone Posters</title>
+    <link rel="icon" type="image/png" href="/common/image/LOGO_FF_SHORT.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Exo-SemiBold';
+            src: url('/common/fonts/Exo-SemiBold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #4a4a4a;
+            --accent-color: #ffba00;
+            --bg-color: #f4f4f4;
+            --paper-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --container-width: 900px;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-wrapper {
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .document-container {
+            max-width: var(--container-width);
+            width: 100%;
+            background: var(--paper-color);
+            padding: 80px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            position: relative;
+            border-top: 5px solid var(--accent-color);
+        }
+
+        .document-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background-image: url('/common/image/LOGO_FF_SHORT.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Exo-SemiBold', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .meta-info {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #777;
+            margin-bottom: 60px;
+            font-style: italic;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-family: 'Exo-SemiBold', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-top: 50px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 24px;
+            background-color: var(--accent-color);
+            margin-right: 12px;
+            border-radius: 2px;
+            transform: translateY(1px);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: 35px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        ul {
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            border-bottom: 1px dotted transparent;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        a:hover {
+            color: #004499;
+            border-bottom: 1px solid #004499;
+        }
+
+        .contact-card {
+            background-color: #fafafa;
+            border: 1px solid #eeeeee;
+            border-left: 4px solid var(--primary-color);
+            padding: 30px;
+            margin-top: 60px;
+            border-radius: 4px;
+        }
+
+        .contact-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-family: 'Exo-SemiBold', sans-serif;
+        }
+
+        .footer-action {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-home:hover {
+            background-color: var(--accent-color);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 186, 0, 0.4);
+            border-bottom: none;
+            text-decoration: none;
+        }
+
+        .btn-home span {
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding: 0;
+            }
+
+            .document-container {
+                padding: 30px 20px;
+                box-shadow: none;
+                border-radius: 0;
+                border-top: none;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+                margin-top: 30px;
+                margin-bottom: 20px;
+            }
+
+            h2::before {
+                width: 4px;
+                height: 20px;
+                margin-right: 8px;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+                margin-top: 25px;
+            }
+
+            .meta-info {
+                width: 100%;
+                font-size: 0.85rem;
+                margin-bottom: 30px;
+            }
+
+            p,
+            li {
+                font-size: 0.95rem;
+            }
+
+            .contact-card {
+                padding: 20px;
+                margin-top: 40px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: none;
+            }
+
+            .document-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .btn-home {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+        <div class="document-container">
+            <div class="content-wrapper">
+                <h1>Chính Sách Hoạt Động</h1>
+
+                <div class="meta-info">
+                    Phiên bản: 1.1.0 &nbsp;|&nbsp; Ngày cập nhật: 04/01/2026
+                </div>
+
+                <h2>1. Thông Tin Phiên Bản (Versioning)</h2>
+                <p>Chúng tôi duy trì hệ thống phiên bản để đảm bảo tính minh bạch trong việc quản lý quy định:</p>
+                <ul>
+                    <li><strong>Phiên bản hiện tại:</strong> 1.1.0</li>
+                    <li><strong>Trạng thái:</strong> Chính thức áp dụng.</li>
+                    <li><strong>Lịch sử cập nhật:</strong>
+                        <ul>
+                            <li><em>v1.0.0 (01/01/2026):</em> Khởi tạo bản thảo đầu tiên.</li>
+                            <li><em>v1.1.0 (04/01/2026):</em> Bổ sung hệ thống website ủy quyền và liên kết đối tác.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h2>2. Hệ Thống Website Ủy Quyền</h2>
+                <p><strong>Zone Posters</strong> (<a href="https://zoneposters.vercel.app/"
+                        target="_blank">https://zoneposters.vercel.app/</a>) xác nhận việc ủy quyền sử dụng nội dung và
+                    các tài nguyên liên quan cho các hệ thống thuộc cùng mạng lưới quản lý.</p>
+                <ul>
+                    <li><strong>Website được ủy quyền:</strong> <a href="https://sgmnetwork.vercel.app/"
+                            target="_blank">SGM Network</a></li>
+                    <li><strong>Phạm vi:</strong> SGM Network được quyền hiển thị, trích dẫn và sử dụng các tài nguyên
+                        đồ họa từ Zone Posters để phục vụ mục đích truyền thông phi thương mại trong cùng hệ thống.</li>
+                    <li><strong>Trách nhiệm:</strong> Cả hai website đều tuân thủ chung một bộ quy chuẩn về bản quyền và
+                        tuyên bố miễn trừ trách nhiệm đã được thiết lập.</li>
+                </ul>
+
+                <h2>3. Mục Đích Hoạt Động</h2>
+                <ul>
+                    <li>Website được vận hành như một danh mục (Portfolio) trực tuyến để lưu trữ và trình bày các sản
+                        phẩm đồ họa, biểu ngữ.</li>
+                    <li><strong>Cam kết:</strong> Website không tích hợp giỏ hàng, không yêu cầu đăng ký tài khoản và
+                        không thực hiện bất kỳ giao dịch mua bán, thu phí nào dưới mọi hình thức.</li>
+                </ul>
+
+                <h2>4. Quy Định Về Bản Quyền & Tài Sản Trí Tuệ</h2>
+                <h3>4.1. Đối với tài sản của Garena</h3>
+                <p>Website có sử dụng các đường dẫn, hình ảnh, nhân vật thuộc quyền sở hữu của <strong>Garena</strong>
+                    (Liên Quân Mobile, Free Fire...). Các tài sản này được sử dụng dưới hình thức chia sẻ cộng đồng,
+                    minh họa thiết kế, không vì mục đích thương mại.</p>
+                <p>Zone Posters và các trang ủy quyền (SGM Network) hoàn toàn tôn trọng quyền tác giả của Garena.</p>
+
+                <h3>4.2. Quyền tác giả của Zone Posters</h3>
+                <p>Các bố cục, sự sắp xếp và các thành phần đồ họa do Zone Posters tự thiết kế được bảo lưu quyền tác
+                    giả. Các bên thứ ba (ngoài SGM Network) không được phép sử dụng lại nội dung khi chưa có sự đồng ý.
+                </p>
+
+                <h3>4.3. Quy trình gỡ bỏ nội dung (Copyright Takedown)</h3>
+                <p>Nếu chủ sở hữu bản quyền có yêu cầu gỡ bỏ hình ảnh, chúng tôi sẽ thực hiện trên cả hai hệ thống (Zone
+                    Posters & SGM Network) trong vòng 24h - 48h sau khi xác thực thông tin.</p>
+
+                <h2>5. Bảo Mật & Dữ Liệu Người Dùng</h2>
+                <ul>
+                    <li>Chúng tôi <strong>không</strong> thu thập thông tin cá nhân của khách truy cập.</li>
+                    <li>Các dữ liệu ẩn danh có thể được ghi nhận bởi nền tảng Vercel nhằm mục đích tối ưu hóa kỹ thuật
+                        và tốc độ truy cập.</li>
+                </ul>
+
+                <h2>6. Điều Khoản Thi Hành</h2>
+                <p>Chính sách này có hiệu lực kể từ ngày cập nhật. Mọi thay đổi trong tương lai sẽ được ghi nhận tại mục
+                    Lịch sử cập nhật để người dùng tiện theo dõi.</p>
+
+                <div class="contact-card">
+                    <h3>Thông Tin Liên Hệ</h3>
+                    <p style="margin-bottom: 5px;">Nếu có bất kỳ câu hỏi nào về vấn đề bản quyền hoặc ủy quyền sử dụng
+                        liên quan đến Garena Free
+                        Fire, vui lòng liên hệ</p>
+                    <p><strong>Quản trị viên:</strong> Nguyễn Minh Khôi<br>
+                        <strong>Email:</strong> <a
+                            href="mailto:blazehunter01062008@gmail.com">blazehunter01062008@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <a href="/" class="btn-home">
+                    <i class="fas fa-arrow-left"></i> <span>Quay lại Trang chủ</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</body>
+
+</html>
