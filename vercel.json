@@ -1,6 +1,14 @@
 {
     "rewrites": [
         {
+            "source": "/policy",
+            "destination": "/policy.html"
+        },
+        {
+            "source": "/terms",
+            "destination": "/terms.html"
+        },
+        {
             "source": "/admin",
             "destination": "/admin/index.html"
         },
