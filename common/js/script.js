@@ -188,9 +188,10 @@ function applyTranslation(langKey) {
 function changeLanguageAndReload(langKey) {
     if (langKey) {
         localStorage.setItem('currentLang', langKey);
-    }
+        applyTranslation(langKey);
 
-    window.location.assign(window.location.pathname);
+        console.log(`Language switched to: ${langKey}`);
+    }
 }
 
 let isFetching = false;
