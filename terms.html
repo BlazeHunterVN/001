@@ -1,54 +1,18 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Điều Khoản Sử Dụng | Zone Posters - Free Fire Elite Portal</title>
+    <title>Terms Of Use</title>
 
     <meta name="description"
-        content="Điều khoản sử dụng của Zone Posters. Quy định pháp lý về quyền sở hữu trí tuệ, ủy quyền sử dụng hình ảnh Free Fire và trách nhiệm người dùng.">
-    <meta name="keywords"
-        content="điều khoản sử dụng, terms of use, free fire posters, bản quyền garena, quy định zone posters, thỏa thuận người dùng">
-    <meta name="author" content="Zone Posters">
+        content="Terms of Use - Legal regulations on intellectual property, Free Fire image usage authorization and user responsibilities. | Quy định pháp lý về quyền sở hữu trí tuệ.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://zoneposters.vercel.app/terms" />
-
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://zoneposters.vercel.app/terms">
-    <meta property="og:title" content="Điều Khoản Sử Dụng | Zone Posters">
-    <meta property="og:description"
-        content="Quy định pháp lý về quyền sở hữu trí tuệ, ủy quyền sử dụng hình ảnh Free Fire và trách nhiệm người dùng.">
-    <meta property="og:image" content="https://zoneposters.vercel.app/common/image/LOGO_FF_SHORT.png">
-
-    <meta property="twitter:card" content="summary">
-    <meta property="twitter:url" content="https://zoneposters.vercel.app/terms">
-    <meta property="twitter:title" content="Điều Khoản Sử Dụng | Zone Posters">
-    <meta property="twitter:description"
-        content="Quy định pháp lý về quyền sở hữu trí tuệ, ủy quyền sử dụng hình ảnh Free Fire và trách nhiệm người dùng.">
-    <meta property="twitter:image" content="https://zoneposters.vercel.app/common/image/LOGO_FF_SHORT.png">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Điều Khoản Sử Dụng",
-      "description": "Điều khoản sử dụng và quy định pháp lý của Zone Posters.",
-      "url": "https://zoneposters.vercel.app/terms",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Zone Posters",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://zoneposters.vercel.app/common/image/LOGO_FF_SHORT.png"
-        }
-      }
-    }
-    </script>
-
     <link rel="icon" type="image/png" href="/common/image/LOGO_FF_SHORT.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <style>
         @font-face {
             font-family: 'Exo-SemiBold';
@@ -66,11 +30,10 @@
             --paper-color: #ffffff;
             --text-color: #333333;
             --link-color: #0066cc;
-            --container-width: 900px;
         }
 
         body {
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
             background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
             background-size: 20px 20px;
@@ -78,11 +41,37 @@
             margin: 0;
             padding: 0;
             line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-switcher a {
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switcher a:hover {
+            background: var(--accent-color);
+            color: #000;
         }
 
         .page-wrapper {
-            padding: 40px 20px;
+            padding: 80px 20px 40px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -90,14 +79,15 @@
         }
 
         .document-container {
-            max-width: var(--container-width);
+            max-width: 900px;
             width: 100%;
             background: var(--paper-color);
             padding: 80px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             border-radius: 4px;
-            position: relative;
             border-top: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            position: relative;
         }
 
         .document-container::before {
@@ -122,13 +112,27 @@
             z-index: 1;
         }
 
+        .language-divider {
+            margin: 80px 0 60px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .language-divider h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
         h1 {
             font-family: 'Exo-SemiBold', sans-serif;
             font-size: 2.8rem;
             color: var(--primary-color);
             margin: 0 0 15px 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
             text-align: center;
         }
 
@@ -157,13 +161,15 @@
 
         h2::before {
             content: '';
-            display: inline-block;
             width: 5px;
             height: 24px;
             background-color: var(--accent-color);
             margin-right: 12px;
             border-radius: 2px;
-            transform: translateY(1px);
+        }
+
+        .language-divider h2::before {
+            display: none;
         }
 
         h3 {
@@ -186,20 +192,18 @@
 
         li {
             margin-bottom: 10px;
-            position: relative;
         }
 
         a {
             color: var(--link-color);
             text-decoration: none;
-            border-bottom: 1px dotted transparent;
             transition: all 0.2s ease;
             font-weight: 500;
         }
 
         a:hover {
             color: #004499;
-            border-bottom: 1px solid #004499;
+            text-decoration: underline;
         }
 
         .warning-box {
@@ -209,7 +213,6 @@
             padding: 20px;
             margin: 25px 0;
             border-radius: 0 4px 4px 0;
-            font-size: 0.95rem;
         }
 
         .contact-card {
@@ -219,17 +222,6 @@
             padding: 30px;
             margin-top: 60px;
             border-radius: 4px;
-        }
-
-        .contact-card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-family: 'Exo-SemiBold', sans-serif;
-        }
-
-        .footer-action {
-            margin-top: 50px;
-            text-align: center;
         }
 
         .legal-notice {
@@ -252,88 +244,33 @@
             border-radius: 30px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
         }
 
         .btn-home:hover {
             background-color: var(--accent-color);
             color: #000;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 186, 0, 0.4);
-            border-bottom: none;
             text-decoration: none;
         }
 
-        .btn-home span {
-            margin-left: 10px;
-        }
-
         @media (max-width: 768px) {
-            .page-wrapper {
-                padding: 0;
-            }
-
             .document-container {
                 padding: 30px 20px;
-                box-shadow: none;
-                border-radius: 0;
-                border-top: none;
+            }
+
+            .lang-switcher {
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
             }
 
             h1 {
                 font-size: 1.8rem;
-                margin-bottom: 10px;
-                margin-top: 10px;
             }
 
             h2 {
                 font-size: 1.3rem;
-                margin-top: 30px;
-                margin-bottom: 20px;
-            }
-
-            h2::before {
-                width: 4px;
-                height: 20px;
-                margin-right: 8px;
-            }
-
-            h3 {
-                font-size: 1.1rem;
-                margin-top: 25px;
-            }
-
-            .meta-info {
-                width: 100%;
-                font-size: 0.85rem;
-                margin-bottom: 30px;
-            }
-
-            p,
-            li {
-                font-size: 0.95rem;
-            }
-
-            .contact-card {
-                padding: 20px;
-                margin-top: 40px;
-            }
-        }
-
-        @media print {
-            body {
-                background: none;
-            }
-
-            .document-container {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                width: 100%;
-                max-width: 100%;
-            }
-
-            .btn-home {
-                display: none;
             }
         }
     </style>
@@ -342,12 +279,117 @@
 <body>
 
     <div class="page-wrapper">
+        <div class="document-container" id="english">
+            <div class="content-wrapper">
+                <h1>Terms of Use</h1>
+
+                <div class="meta-info">
+                    Version: 2.0.1 &nbsp;|&nbsp; Last Updated: January 5, 2026
+                </div>
+
+                <p style="font-size: 1.1rem; text-align: center; margin-bottom: 40px;">Welcome to <strong>Zone
+                        Posters</strong>. The following terms establish a legally binding agreement between Users and
+                    the Zone Posters Administration.</p>
+
+                <h2>1. Definitions and Scope</h2>
+                <p><strong>1.1. Services:</strong> Include accessing, viewing, downloading poster designs
+                    on the website <a href="https://zoneposters.vercel.app/"
+                        target="_blank">https://zoneposters.vercel.app/</a>.</p>
+                <p><strong>1.2. Content:</strong> All images, graphics, banners, and source code displayed.</p>
+
+                <h2>2. Regulations Regarding Garena Free Fire Content</h2>
+                <p>Zone Posters website provides designs related to the Garena Free Fire game. The parties acknowledge
+                    the following legal terms:</p>
+
+                <h3>2.1. Trademark Ownership</h3>
+                <p>Zone Posters acknowledges that the "Garena", "Free Fire" brands, logos, characters, and original
+                    in-game images are copyrighted and intellectual property of <strong>Garena Online Private
+                        Limited</strong>.</p>
+
+                <h3>2.2. Derivative Authorization</h3>
+                <p>The poster products on this website are derivative graphic works created by Zone Posters. You are
+                    only allowed to use this content for personal, non-commercial purposes.</p>
+
+                <h3>2.3. Limitation of Liability</h3>
+                <p>Zone Posters does not represent Garena. We are not responsible if Garena requests removal or changes
+                    to their image-related content on your device.</p>
+
+                <div class="warning-box">
+                    <strong>2.4. Strictly Prohibited:</strong> Absolutely do not use Free Fire banners or posters from
+                    this website to promote services that violate Garena's terms (such as game hacks/mods, diamond
+                    scams, or betting websites).
+                </div>
+
+                <h2>3. Usage Authorization and Copyright</h2>
+                <p><strong>3.1. Limited License:</strong> When you access, we grant you a non-exclusive,
+                    non-transferable license to view and use content according to the website's intended purpose.</p>
+                <p><strong>3.2. Copyright:</strong> Zone Posters retains copyright for arrangements, color schemes, and
+                    self-designed graphic details. Any act of removing "Watermark" or copyright information on posters
+                    is a violation of terms.</p>
+                <p><strong>3.3. Third-party Authorization:</strong> For third-party assets (such as fonts, icons), we
+                    commit to using them according to the license (Open Source or Commercial License) specified by the
+                    provider.</p>
+
+                <h2>4. Legal Responsibilities Between Parties</h2>
+
+                <h3>4.1. User Responsibilities:</h3>
+                <ul>
+                    <li>Ensure information provided when using services is accurate</li>
+                    <li>Take full legal responsibility if using our posters for purposes violating the laws of your
+                        country</li>
+                </ul>
+
+                <h3>4.2. Zone Posters Responsibilities:</h3>
+                <ul>
+                    <li>Protect user information according to Vercel platform standards</li>
+                    <li>Support resolution of technical issues related to content display and loading</li>
+                </ul>
+
+                <h3>4.3. Force Majeure:</h3>
+                <p>We are not responsible for service interruptions due to infrastructure factors (Vercel, Cloudflare)
+                    or legal events beyond our control.</p>
+
+                <h2>5. Termination and Violation Handling</h2>
+                <ul>
+                    <li><strong>5.1.</strong> Zone Posters has the right to block access (IP/Account) for entities with
+                        denial-of-service attack (DDoS) behaviors or unauthorized data collection (Scraping).</li>
+                    <li><strong>5.2.</strong> Any disputes arising will be prioritized for resolution through
+                        negotiation. If an agreement cannot be reached, disputes will be adjudicated according to
+                        current laws in Vietnam.</li>
+                </ul>
+
+                <div class="contact-card">
+                    <h3>6. Contact Information</h3>
+                    <p>If you have any questions regarding copyright or usage authorization related to Garena Free Fire,
+                        please contact:</p>
+                    <p>
+                        <strong>Administrator:</strong> Nguyễn Minh Khôi<br>
+                        <strong>Email:</strong> <a
+                            href="mailto:blazehunter01062008@gmail.com">blazehunter01062008@gmail.com</a>
+                    </p>
+                </div>
+
+                <div class="legal-notice">
+                    This terms document serves as legal evidence when copyright disputes occur between users and the
+                    platform.
+                </div>
+
+                <div style="text-align: center;">
+                    <a href="/" class="btn-home">← Back To Home</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="language-divider" id="vietnamese">
+            <h2>Phiên Bản Tiếng Việt</h2>
+        </div>
+
         <div class="document-container">
             <div class="content-wrapper">
                 <h1>Điều Khoản Sử Dụng</h1>
 
                 <div class="meta-info">
-                    Phiên bản: 2.0.1 &nbsp;|&nbsp; Ngày cập nhật: 04/01/2026
+                    Phiên bản: 2.0.1 &nbsp;|&nbsp; Ngày cập nhật: 05/01/2026
                 </div>
 
                 <p style="font-size: 1.1rem; text-align: center; margin-bottom: 40px;">Chào mừng bạn đến với
@@ -356,8 +398,8 @@
                 </p>
 
                 <h2>1. Định Nghĩa Và Phạm Vi</h2>
-                <p><strong>1.1. Dịch vụ:</strong> Bao gồm việc truy cập, xem, tải xuống hoặc mua các thiết kế poster
-                    trên website <a href="https://zoneposters.vercel.app/"
+                <p><strong>1.1. Dịch vụ:</strong> Bao gồm việc truy cập, xem, tải xuống các thiết kế poster
+                    trên website <br><a href="https://zoneposters.vercel.app/"
                         target="_blank">https://zoneposters.vercel.app/</a>.</p>
                 <p><strong>1.2. Nội dung:</strong> Tất cả hình ảnh, đồ họa, biểu ngữ (banners), và mã nguồn được hiển
                     thị.</p>
@@ -395,6 +437,7 @@
                     bên cung cấp quy định.</p>
 
                 <h2>4. Trách Nhiệm Pháp Lý Giữa Các Bên</h2>
+
                 <h3>4.1. Trách nhiệm của Người dùng:</h3>
                 <ul>
                     <li>Đảm bảo các thông tin cung cấp khi sử dụng dịch vụ là chính xác.</li>
@@ -425,7 +468,8 @@
                     <h3>6. Thông Tin Liên Hệ</h3>
                     <p>Nếu có bất kỳ câu hỏi nào về vấn đề bản quyền hoặc ủy quyền sử dụng liên quan đến Garena Free
                         Fire, vui lòng liên hệ</p>
-                    <p><strong>Quản trị viên:</strong> Nguyễn Minh Khôi<br>
+                    <p>
+                        <strong>Quản trị viên:</strong> Nguyễn Minh Khôi<br>
                         <strong>Email:</strong> <a
                             href="mailto:blazehunter01062008@gmail.com">blazehunter01062008@gmail.com</a>
                     </p>
@@ -435,12 +479,10 @@
                     Bản điều khoản này đóng vai trò là bằng chứng pháp lý khi có khiếu nại về bản quyền xảy ra giữa
                     người dùng và nền tảng.
                 </div>
-            </div>
 
-            <div class="footer-action">
-                <a href="/" class="btn-home">
-                    <i class="fas fa-arrow-left"></i> <span>Quay lại Trang chủ</span>
-                </a>
+                <div style="text-align: center;">
+                    <a href="/" class="btn-home">← Quay Lại Trang Chủ</a>
+                </div>
             </div>
         </div>
     </div>

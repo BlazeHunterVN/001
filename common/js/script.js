@@ -12,7 +12,6 @@ const translations = {
         'news_heading': 'TIN TỨC',
         'contact_heading': 'LIÊN HỆ VỚI CHÚNG TÔI',
         'contact_info': 'THÔNG TIN LIÊN HỆ Ở ĐÂY.',
-        'operating_policy': 'CHÍNH SÁCH HOẠT ĐỘNG',
         'terms_of_use': 'ĐIỀU KHOẢN SỬ DỤNG',
         'select_prompt': 'VUI LÒNG CHỌN MỘT QUỐC GIA',
         'update_banner': 'DỮ LIỆU BIỂU NGỮ ĐANG ĐƯỢC CẬP NHẬT.',
@@ -38,7 +37,6 @@ const translations = {
         'news_heading': 'NEWS',
         'contact_heading': 'CONTACT US',
         'contact_info': 'CONTACT INFORMATION HERE.',
-        'operating_policy': 'OPERATING POLICY',
         'terms_of_use': 'TERMS OF USE',
         'select_prompt': 'PLEASE SELECT A COUNTRY',
         'update_banner': 'BANNER DATA IS CURRENTLY BEING UPDATED.',
@@ -547,20 +545,15 @@ function getEventStatus(startDateString) {
         return { status: 'none', label: '' };
     }
 
-    const parts = startDateString.split('/');
-    if (parts.length !== 3) {
-        return { status: 'none', label: '' };
-    }
-    const [day, month, year] = parts.map(Number);
-    const startDate = new Date(Date.UTC(year, month - 1, day));
+    const startDate = convertDateStringToDate(startDateString);
 
-    if (isNaN(startDate.getTime())) {
+    if (isNaN(startDate.getTime()) || startDate.getTime() === 0) {
         return { status: 'none', label: '' };
     }
 
     const now = new Date();
     const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const eventDay = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+    const eventDay = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()));
 
     if (eventDay <= today) {
         return { status: 'active', label: t['active'] };
@@ -900,7 +893,7 @@ languageLinks.forEach(link => {
         e.preventDefault();
         e.stopPropagation();
 
-        const selectedLangKey = e.target.dataset.lang;
+        const selectedLangKey = e.currentTarget.dataset.lang; // Fixed: use currentTarget
 
         if (selectedLangKey === 'vietnam' || selectedLangKey === 'default') {
             changeLanguageAndReload(selectedLangKey);
@@ -948,7 +941,17 @@ if (mobileLangSelector) {
 
                         if (dateValue && dateValue.trim() !== '') {
                             const dateLabel = isNews ? t['date_posting'] : t['start_date'];
-                            let dateText = `${dateLabel}: ${dateValue}`;
+
+                            let displayStartDate = dateValue;
+                            const startObj = convertDateStringToDate(dateValue);
+                            if (!isNaN(startObj.getTime()) && startObj.getTime() !== 0) {
+                                const day = String(startObj.getUTCDate()).padStart(2, '0');
+                                const month = String(startObj.getUTCMonth() + 1).padStart(2, '0');
+                                const year = startObj.getUTCFullYear();
+                                displayStartDate = `${day}/${month}/${year}`;
+                            }
+
+                            let dateText = `${dateLabel}: ${displayStartDate}`;
 
                             if (!isNews) {
                                 let displayEndDate = "";

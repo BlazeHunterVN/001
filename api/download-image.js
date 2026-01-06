@@ -5,7 +5,6 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-    // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -20,7 +19,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'URL parameter is required' });
     }
 
-    // Validate URL
     try {
         new URL(url);
     } catch (e) {
@@ -34,7 +32,6 @@ export default async function handler(req, res) {
         attempts++;
 
         try {
-            // Fetch the image from the external URL with timeout
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
@@ -55,31 +52,24 @@ export default async function handler(req, res) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            // Get the image buffer
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 
-            // Extract filename from URL
             const urlPath = new URL(url).pathname;
             const fileName = urlPath.substring(urlPath.lastIndexOf('/') + 1) || 'image.jpg';
 
-            // Detect content type
             const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-            // Set headers for download
             res.setHeader('Content-Type', contentType);
             res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
             res.setHeader('Content-Length', buffer.length);
             res.setHeader('Cache-Control', 'public, max-age=86400');
             res.setHeader('X-Download-Attempts', attempts.toString());
 
-            // Send the image
             return res.status(200).send(buffer);
 
         } catch (error) {
             console.error(`Download attempt ${attempts} failed:`, error.message);
-
-            // If this was the last attempt, return error
             if (attempts >= maxAttempts) {
                 return res.status(500).json({
                     error: 'Failed to download image after multiple attempts',
@@ -89,7 +79,6 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Wait before retry (exponential backoff)
             await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
         }
     }
