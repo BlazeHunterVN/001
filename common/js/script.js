@@ -26,7 +26,8 @@ const translations = {
         'ending': 'SẮP KẾT THÚC',
         'check_back': 'VUI LÒNG KIỂM TRA LẠI SAU.',
         'check_back_news': 'VUI LÒNG KIỂM TRA LẠI SAU ĐỂ CẬP NHẬT TIN TỨC MỚI NHẤT.',
-        'download_image': 'TẢI ẢNH VỀ THIẾT BỊ'
+        'download_image': 'TẢI ẢNH VỀ THIẾT BỊ',
+        'privacy_policy': 'CHÍNH SÁCH BẢO MẬT'
     },
     'default': {
         'home_link': 'HOME',
@@ -51,7 +52,8 @@ const translations = {
         'ending': 'ENDING',
         'check_back': 'PLEASE CHECK BACK LATER.',
         'check_back_news': 'PLEASE CHECK BACK LATER FOR THE LATEST NEWS.',
-        'download_image': 'DOWNLOAD IMAGE'
+        'download_image': 'DOWNLOAD IMAGE',
+        'privacy_policy': 'PRIVACY POLICY'
     }
 };
 

@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="vKpEfaaix3tyf3KNuLOD4z3LE4K1_5RnaU_lwqDOD9U" />
     <meta name="robots" content="noindex, nofollow">
-    <title>Admin Panel - Elite Portal</title>
+    <title>Admin Panel - Zone Posters | Authorized Access Only</title>
     <meta name="description"
-        content="Admin Panel - Elite Portal: Manage website banners, posters, and settings with professional security and performance monitoring.">
+        content="Admin Panel for Zone Posters (zoneposters.vercel.app) - Authorized Personnel Only. This area is for managing Free Fire poster content and requires authentication. If you reached this page accidentally, please return to the homepage.">
     <link rel="icon" type="image" href="/common/image/LOGO_FF_SHORT.png" />
     <link rel="stylesheet" href="/admin/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -52,7 +52,17 @@
 
     <div id="login-container" class="login-container">
         <div class="login-card">
-            <h2>Login Admin</h2>
+            <div class="security-notice">
+                <strong>⚠️ AUTHORIZED PERSONNEL ONLY</strong>
+                Admin Panel for ZonePosters.vercel.app Banner Management
+            </div>
+
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="/common/image/LOGO_FF_SHORT.png" alt="Zone Posters Logo"
+                    style="width: 60px; height: 60px; margin-bottom: 10px;">
+                <h2 style="margin: 10px 0 5px 0; font-size: 1.5rem;">Admin Login</h2>
+                <p style="color: #666; font-size: 0.85rem; margin: 0;">Zone Posters - Free Fire Image Gallery</p>
+            </div>
 
             <div id="login-error" class="error-message" style="display: none;"></div>
 
@@ -74,6 +84,19 @@
             <button id="btn-google-login" class="btn btn-google">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/250px-Google_Favicon_2025.svg.png"
                     alt="Google" style="width: 20px; height: 20px;">Google</button>
+
+            <div class="security-info-box">
+                <strong>ℹ️ Why am I seeing this?</strong>
+                This is the admin panel for Zone Posters. Access is restricted to authorized administrators only.
+                <ul>
+                    <li>This page manages image content for the website</li>
+                    <li>We do NOT collect personal data from public visitors</li>
+                    <li>Images are downloaded directly to user devices</li>
+                    <li>No registration or payment required for visitors</li>
+                </ul>
+                <a href="/privacy" target="_blank" class="privacy-link">📄 Read our Privacy Policy</a><br>
+                <a href="/" class="privacy-link">🏠 Return to Homepage</a>
+            </div>
         </div>
     </div>
 

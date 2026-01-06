@@ -1,16 +1,59 @@
-# Free Fire Posters - Robots.txt
-# https://zoneposters.vercel.app/robots.txt
+# ============================================
+# Free Fire Posters - robots.txt
+# Website: https://zoneposters.vercel.app/
+# Purpose: Image gallery for Free Fire promotional posters
+# ============================================
 
-# Allow all search engines
+# WEBSITE PURPOSE & SAFETY NOTICE:
+# This is a NON-COMMERCIAL image gallery website
+# We display official Free Fire promotional images
+# We DO NOT collect personal information from visitors
+# We DO NOT sell products or require registration
+# Images are downloaded directly to user devices only
+
+# --------------------------------------------
+# Search Engine Access Rules
+# --------------------------------------------
+
 User-agent: *
 Allow: /
 
-# Block admin area from all search engines
+# Allow important pages
+Allow: /policy
+Allow: /terms
+Allow: /privacy
+Allow: /.well-known/security.txt
+
+# --------------------------------------------
+# ADMIN SECTION - BLOCKED FOR SECURITY
+# --------------------------------------------
+# The /admin path is for AUTHORIZED PERSONNEL ONLY
+# It is used by website administrators to manage content
+# This is NOT a public section and should not be indexed
+# Blocking this prevents confusion and potential security issues
+
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /api/*
 
-# Sitemap location
+# Block internal/development files
+Disallow: /*.json
+Allow: /manifest.json
+
+# --------------------------------------------
+# Additional Information
+# --------------------------------------------
+
+# Sitemap for better indexing
 Sitemap: https://zoneposters.vercel.app/sitemap.xml
 
-# Crawl-delay (optional, helps with server load)
+# Crawl delay to reduce server load
 Crawl-delay: 1
+
+# Security & Privacy Information
+# For security issues: /.well-known/security.txt
+# Privacy policy: /privacy
+# Operating policy: /policy
+# Contact: blazehunter01062008@gmail.com
+
+# Last updated: 2026-01-05
