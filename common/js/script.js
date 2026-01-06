@@ -13,6 +13,14 @@ const translations = {
         'contact_heading': 'LIÊN HỆ VỚI CHÚNG TÔI',
         'contact_info': 'THÔNG TIN LIÊN HỆ Ở ĐÂY.',
         'terms_of_use': 'ĐIỀU KHOẢN SỬ DỤNG',
+        'nation_brazil': 'BRAZIL',
+        'nation_india': 'ẤN ĐỘ',
+        'nation_indonesia': 'INDONESIA',
+        'nation_pakistan': 'PAKISTAN',
+        'nation_singapore': 'SINGAPORE',
+        'nation_taiwan': 'ĐÀI LOAN',
+        'nation_thailand': 'THÁI LAN',
+        'nation_vietnam': 'VIỆT NAM',
         'select_prompt': 'VUI LÒNG CHỌN MỘT QUỐC GIA',
         'update_banner': 'DỮ LIỆU BIỂU NGỮ ĐANG ĐƯỢC CẬP NHẬT.',
         'update_news': 'DỮ LIỆU TIN TỨC ĐANG ĐƯỢC CẬP NHẬT.',
@@ -38,6 +46,14 @@ const translations = {
         'contact_heading': 'CONTACT US',
         'contact_info': 'CONTACT INFORMATION HERE.',
         'terms_of_use': 'TERMS OF USE',
+        'nation_brazil': 'BRAZIL',
+        'nation_india': 'INDIA',
+        'nation_indonesia': 'INDONESIA',
+        'nation_pakistan': 'PAKISTAN',
+        'nation_singapore': 'SINGAPORE',
+        'nation_taiwan': 'TAIWAN',
+        'nation_thailand': 'THAILAND',
+        'nation_vietnam': 'VIETNAM',
         'select_prompt': 'PLEASE SELECT A COUNTRY',
         'update_banner': 'BANNER DATA IS CURRENTLY BEING UPDATED.',
         'update_news': 'NEWS DATA IS CURRENTLY BEING UPDATED.',
@@ -179,9 +195,19 @@ function applyTranslation(langKey) {
     currentLanguage = langKey;
     const currentPath = window.location.pathname;
     const parts = currentPath.split('/');
-    const key = parts[parts.length - 1];
+    const key = parts[parts.length - 1]; // This might be empty for home
+
     if (currentPath.startsWith('/nation') || currentPath === '/news') {
         updateSectionHeadings(currentPath, key);
+
+        // RE-RENDER IMAGES TO UPDATE LABELS (Active/Upcoming/Date)
+        if (currentPath.startsWith('/nation/')) {
+            displayImages(key, false);
+        } else if (currentPath === '/nation') {
+            displayImages('default', false);
+        } else if (currentPath === '/news') {
+            displayImages('news', true);
+        }
     }
 }
 
