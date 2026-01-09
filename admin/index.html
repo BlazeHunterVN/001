@@ -51,12 +51,11 @@
 
     <div id="login-container" class="login-container">
         <div class="login-card">
-
             <div style="text-align: center; margin-bottom: 25px;">
                 <img src="/common/image/LOGO_FF_SHORT.png" alt="Zone Posters Logo"
                     style="width: 60px; height: 60px; margin-bottom: 10px;">
                 <h2 style="margin: 10px 0 5px 0; font-size: 1.5rem;">Admin Login</h2>
-                <p style="color: #666; font-size: 0.85rem; margin: 0;">Zone Posters - Free Fire Image Gallery</p>
+                <p style="color: #666; font-size: 0.85rem; margin: 0;">Zone Posters - Free Fire</p>
             </div>
 
             <div id="login-error" class="error-message" style="display: none;"></div>
@@ -98,6 +97,9 @@
         <main class="dashboard-main">
             <aside class="sidebar">
                 <nav class="sidebar-nav">
+                    <button class="tab-link" data-tab="grant-access" id="nav-grant-access" style="display: none;">
+                        <i class="fas fa-user-shield"></i> <span>GRANT ACCESS</span>
+                    </button>
                     <button class="tab-link active" data-tab="banners">
                         <i class="fas fa-image"></i> <span>BANNER</span>
                     </button>
@@ -108,6 +110,52 @@
             </aside>
 
             <div class="tab-content">
+                <section id="grant-access-tab" class="tab-pane">
+                    <section class="admin-card">
+                        <div class="card-header">
+                            <h3>GRANT ACCESS</h3>
+                            <i class="fas fa-chevron-up toggle-btn"></i>
+                        </div>
+                        <form id="grant-access-form">
+                            <input type="hidden" id="is-edit-admin" value="false">
+                            <div class="form-group">
+                                <label for="admin-email">EMAIL</label>
+                                <input type="email" id="admin-email" required placeholder="admin@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-key">PASSWORD</label>
+                                <input type="text" id="admin-key" required placeholder="password">
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-role">ROLE</label>
+                                <select id="admin-role" required>
+                                    <option value="admin">Admin</option>
+                                    <option value="Senior Admin">Senior Admin</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" id="btn-save-admin" class="btn btn-primary-full">ADD USER</button>
+                            <button type="button" id="btn-cancel-admin" class="btn btn-danger"
+                                style="margin-top: 10px; display: none;">CANCEL</button>
+                        </form>
+                    </section>
+
+                    <div class="banner-list-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>EMAIL</th>
+                                    <th>PASSWORD</th>
+                                    <th>ROLE</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
                 <section id="banners-tab" class="tab-pane active">
                     <section class="admin-card">
                         <div class="card-header">
@@ -239,6 +287,5 @@
 
     <script src="/admin/app.js?v=3.1.2"></script>
 </body>
-
 
 </html>

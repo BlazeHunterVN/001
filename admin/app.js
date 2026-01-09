@@ -83,6 +83,8 @@ async function checkSession() {
         const email = session.user.email;
         const isAllowed = await checkWhitelist(email);
         if (isAllowed) {
+            localStorage.setItem('admin_email', email); // Ensure email is saved for role check
+            localStorage.setItem('admin_granted', 'true');
             showDashboard();
         } else {
             await supabaseClient.auth.signOut();
@@ -149,8 +151,56 @@ async function handleKeyLogin() {
     }
 }
 
+async function checkAdminRole() {
+    let email = localStorage.getItem('admin_email');
+
+    // Fallback: If no email in local storage, verify with session
+    if (!email) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user.email) {
+            email = session.user.email;
+            localStorage.setItem('admin_email', email);
+        } else {
+            console.warn("No admin email found for role check.");
+            return;
+        }
+    }
+
+    console.log("Checking role for:", email);
+
+    try {
+        const { data: role, error } = await supabaseClient.rpc('get_admin_role', {
+            p_email: email
+        });
+
+        console.log("Role result:", role, "Error:", error);
+
+
+
+        if (error) {
+            console.error('RPC Error:', error);
+            if (error.message && error.message.includes('function') && error.message.includes('does not exist')) {
+                alert('SYSTEM NOTICE: Database function missing. Run "admin/COMPLETE_SETUP.sql" in Supabase.');
+            }
+        }
+
+        if (role && role.toLowerCase() === 'senior admin') {
+            if (navGrantAccess) {
+                navGrantAccess.style.display = 'flex';
+                // Trigger reflow/redraw
+                navGrantAccess.offsetHeight;
+            }
+        } else {
+            if (navGrantAccess) navGrantAccess.style.display = 'none';
+        }
+    } catch (err) {
+        console.error('Error checking role:', err);
+    }
+}
+
 window.addEventListener('load', () => {
-    if (localStorage.getItem('admin_granted') === 'true') {
+    // If we have grant, but no email, we should re-verify session to get the email
+    if (localStorage.getItem('admin_granted') === 'true' && localStorage.getItem('admin_email')) {
         showDashboard();
     } else {
         checkSession();
@@ -322,11 +372,15 @@ if (bannerType) {
     });
 }
 
-if (cardHeader) {
-    cardHeader.addEventListener('click', () => {
-        adminCard.classList.toggle('collapsed');
+const cardHeaders = document.querySelectorAll('.card-header');
+cardHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+        const card = header.closest('.admin-card');
+        if (card) {
+            card.classList.toggle('collapsed');
+        }
     });
-}
+});
 
 function renderBanners(banners) {
     bannerTableBody.innerHTML = '';
@@ -557,3 +611,137 @@ if (btnDeleteSelected) {
         }
     });
 }
+
+const navGrantAccess = document.getElementById('nav-grant-access');
+const adminTableBody = document.getElementById('admin-table-body');
+const grantAccessForm = document.getElementById('grant-access-form');
+const btnSaveAdmin = document.getElementById('btn-save-admin');
+const btnCancelAdmin = document.getElementById('btn-cancel-admin');
+const isEditAdminInput = document.getElementById('is-edit-admin');
+
+const originalShowDashboard = showDashboard;
+showDashboard = function () {
+    originalShowDashboard();
+    checkAdminRole();
+
+    if (navGrantAccess && navGrantAccess.classList.contains('active') && navGrantAccess.style.display === 'none') {
+        document.querySelector('[data-tab="banners"]').click();
+    }
+};
+
+async function fetchAdminUsers() {
+    const email = localStorage.getItem('admin_email');
+    const key = localStorage.getItem('admin_key');
+
+    const { data: users, error } = await supabaseClient.rpc('manage_get_admins', {
+        p_email: email,
+        p_key: key
+    });
+
+    if (error) {
+        console.error('Error fetching admins:', error);
+        adminTableBody.innerHTML = `<tr><td colspan="4" style="color: red; text-align: center;">Error: ${error.message}</td></tr>`;
+        return;
+    }
+
+    renderAdminUsers(users);
+}
+
+function renderAdminUsers(users) {
+    if (!adminTableBody) return;
+    adminTableBody.innerHTML = '';
+
+    users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.email}</td>
+            <td style="font-family: monospace;">${user.access_key}</td>
+            <td><span class="badge ${user.role === 'Senior Admin' ? 'badge-primary' : 'badge-info'}">${user.role || 'Admin'}</span></td>
+            <td>
+                <button class="action-btn btn-edit" type="button" onclick="editAdmin('${user.email}', '${user.access_key}', '${user.role}')"><i class="fas fa-edit"></i></button>
+                <button class="action-btn btn-delete" type="button" onclick="deleteAdmin('${user.email}')"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        adminTableBody.appendChild(tr);
+    });
+}
+
+window.editAdmin = (email, key, role) => {
+    document.getElementById('admin-email').value = email;
+    document.getElementById('admin-email').readOnly = true;
+    document.getElementById('admin-key').value = key;
+    document.getElementById('admin-role').value = role || 'admin';
+
+    isEditAdminInput.value = 'true';
+    btnSaveAdmin.textContent = 'UPDATE USER';
+    btnCancelAdmin.style.display = 'inline-block';
+
+    // Scroll to form
+    grantAccessForm.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.deleteAdmin = async (targetEmail) => {
+    if (confirm(`Are you sure you want to delete admin user: ${targetEmail}?`)) {
+        const email = localStorage.getItem('admin_email');
+        const key = localStorage.getItem('admin_key');
+
+        const { error } = await supabaseClient.rpc('manage_admin_delete', {
+            p_requester_email: email,
+            p_requester_key: key,
+            p_target_email: targetEmail
+        });
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            fetchAdminUsers();
+        }
+    }
+};
+
+if (grantAccessForm) {
+    grantAccessForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const targetEmail = document.getElementById('admin-email').value;
+        const targetKey = document.getElementById('admin-key').value;
+        const targetRole = document.getElementById('admin-role').value;
+
+        const email = localStorage.getItem('admin_email');
+        const key = localStorage.getItem('admin_key');
+
+        const { error } = await supabaseClient.rpc('manage_admin_upsert', {
+            p_requester_email: email,
+            p_requester_key: key,
+            p_target_email: targetEmail,
+            p_target_key: targetKey,
+            p_target_role: targetRole
+        });
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            alert('User saved successfully');
+            resetAdminForm();
+            fetchAdminUsers();
+        }
+    });
+
+    btnCancelAdmin.addEventListener('click', resetAdminForm);
+}
+
+function resetAdminForm() {
+    grantAccessForm.reset();
+    document.getElementById('admin-email').readOnly = false;
+    isEditAdminInput.value = 'false';
+    btnSaveAdmin.textContent = 'ADD USER';
+    btnCancelAdmin.style.display = 'none';
+}
+
+tabLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (link.dataset.tab === 'grant-access') {
+            fetchAdminUsers();
+        }
+    });
+});

@@ -218,7 +218,7 @@ body {
     transform: rotate(180deg);
 }
 
-.admin-card.collapsed #banner-form {
+.admin-card.collapsed form {
     display: none;
 }
 
@@ -372,6 +372,11 @@ option:disabled {
 .badge-warning {
     background-color: #fef3c7;
     color: #92400e;
+}
+
+.badge-primary {
+    background-color: var(--primary-color);
+    color: white;
 }
 
 .filter-section {
