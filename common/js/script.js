@@ -34,7 +34,9 @@ const translations = {
         'check_back': 'VUI LÒNG KIỂM TRA LẠI SAU.',
         'check_back_news': 'VUI LÒNG KIỂM TRA LẠI SAU ĐỂ CẬP NHẬT TIN TỨC MỚI NHẤT.',
         'download_image': 'TẢI ẢNH VỀ THIẾT BỊ',
-        'privacy_policy': 'CHÍNH SÁCH BẢO MẬT'
+        'privacy_policy': 'CHÍNH SÁCH BẢO MẬT',
+        'view_all': 'XEM TẤT CẢ',
+        'latest_news': 'TIN TỨC MỚI NHẤT'
     },
     'default': {
         'home_link': 'HOME',
@@ -67,7 +69,9 @@ const translations = {
         'check_back': 'PLEASE CHECK BACK LATER.',
         'check_back_news': 'PLEASE CHECK BACK LATER FOR THE LATEST NEWS.',
         'download_image': 'DOWNLOAD IMAGE',
-        'privacy_policy': 'PRIVACY POLICY'
+        'privacy_policy': 'PRIVACY POLICY',
+        'view_all': 'VIEW ALL',
+        'latest_news': 'LATEST NEWS'
     }
 };
 
@@ -208,6 +212,9 @@ function applyTranslation(langKey) {
         } else if (currentPath === '/news') {
             displayImages('news', true);
         }
+
+        // Update news preview with new language
+        updateLatestNewsPreview();
     }
 }
 
@@ -285,6 +292,7 @@ async function fetchDataFromAPI(silent = false) {
             const parts = currentPath.split('/');
             const key = parts[parts.length - 1];
 
+
             if (currentPath.startsWith('/nation/')) {
                 displayImages(key, false);
             } else if (currentPath === '/nation') {
@@ -293,9 +301,14 @@ async function fetchDataFromAPI(silent = false) {
                 displayImages('news', true);
             }
 
+            // Always update the home news preview if the element exists
+            updateLatestNewsPreview();
+
             console.log("%c[Auto-Refresh] ✅ UI updated successfully!", "color: #4caf50; font-weight: bold;");
         } else {
             if (!silent) console.log("[Auto-Refresh] No changes detected.");
+            // Also ensure it's populated on initial load even if no change
+            updateLatestNewsPreview();
         }
 
         if (settings) {
@@ -317,10 +330,11 @@ async function fetchDataFromAPI(silent = false) {
     }
 }
 
-console.log("%c[Auto-Refresh] 🔄 Polling started. Checking for updates every 10 seconds...", "color: #2196f3; font-weight: bold;");
-setInterval(() => {
-    fetchDataFromAPI(true);
-}, 10000);
+// Auto-refresh DISABLED to prevent constant reloading
+// console.log("%c[Auto-Refresh] 🔄 Polling started. Checking for updates every 10 seconds...", "color: #2196f3; font-weight: bold;");
+// setInterval(() => {
+//     fetchDataFromAPI(true);
+// }, 10000);
 
 async function fetchHomeSettings() {
     console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
@@ -759,6 +773,15 @@ function displayImages(key, isNews = false) {
     });
 
     images.sort((a, b) => {
+        // Get status for both items
+        const statusA = getBannerStatus(a.startDate, a.endDate).status;
+        const statusB = getBannerStatus(b.startDate, b.endDate).status;
+
+        // ENDING items go to the end
+        if (statusA === 'ending' && statusB !== 'ending') return 1;
+        if (statusA !== 'ending' && statusB === 'ending') return -1;
+
+        // For items with same status priority, sort by date
         const dateA = convertDateStringToDate(a.startDate);
         const dateB = convertDateStringToDate(b.startDate);
 
@@ -1209,6 +1232,104 @@ document.addEventListener('DOMContentLoaded', async () => {
     const parts = currentPath.split('/');
     const key = parts[parts.length - 1] || '';
     handleRouting(currentPath, key);
+
+    // Immediately update news preview on home page
+    setTimeout(() => {
+        if (currentPath === '/' || currentPath === '/index.html' || currentPath === '') {
+            updateLatestNewsPreview();
+        }
+    }, 0);
+
+    function updateLatestNewsPreview() {
+        const previewContainer = document.getElementById('latest-news-preview');
+        // Also check for the section wrapper if we need to show/hide it
+        const previewSection = document.getElementById('latest-news-preview-section');
+
+        if (!previewContainer) return;
+
+        const data = nationData['news'];
+        const t = translations[currentLanguage];
+
+        if (!data || !data.images || data.images.length === 0) {
+            if (previewSection) previewSection.style.display = 'none';
+            return;
+        }
+
+        if (previewSection) previewSection.style.display = 'block';
+
+        // Sort by date (newest first)
+        const sortedImages = [...data.images].sort((a, b) => {
+            const dateA = convertDateStringToDate(a.startDate);
+            const dateB = convertDateStringToDate(b.startDate);
+            return dateB.getTime() - dateA.getTime();
+        });
+
+        // Take top 3
+        const latestThree = sortedImages.slice(0, 3);
+
+        previewContainer.innerHTML = '';
+
+        latestThree.forEach((item, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('news-preview-item');
+            previewItem.style.opacity = '0';
+            previewItem.style.transform = 'translateY(20px)';
+
+            // Image Wrapper
+            const imgWrapper = document.createElement('div');
+            imgWrapper.classList.add('news-preview-image-wrapper');
+
+            const img = document.createElement('img');
+            const altText = item.title || t['no_title'];
+            const finalAttributes = getOptimizedImageAttributes(item.url, altText);
+            img.src = finalAttributes.src;
+            img.alt = finalAttributes.alt;
+            img.loading = 'lazy';
+
+            imgWrapper.appendChild(img);
+
+            // Meta (Date | Category)
+            const meta = document.createElement('div');
+            meta.classList.add('news-preview-meta');
+
+            // Date
+            let dateStr = '';
+            try {
+                const dateObj = convertDateStringToDate(item.startDate);
+                const day = String(dateObj.getUTCDate()).padStart(2, '0');
+                const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+                const year = dateObj.getUTCFullYear();
+                dateStr = `${day}/${month}/${year}`;
+            } catch (e) {
+                dateStr = item.startDate;
+            }
+
+            // Construct "DATE | NEWS"
+            meta.innerHTML = `${dateStr} <span class="meta-separator">|</span> NEWS`;
+
+            // Title
+            const title = document.createElement('h3');
+            title.classList.add('news-preview-title');
+            title.textContent = item.title || t['no_title'];
+
+            previewItem.appendChild(imgWrapper);
+            previewItem.appendChild(meta);
+            previewItem.appendChild(title);
+
+            previewItem.addEventListener('click', () => {
+                openOverlay(item);
+            });
+
+            previewContainer.appendChild(previewItem);
+
+            // Animate in
+            setTimeout(() => {
+                previewItem.style.opacity = '1';
+                previewItem.style.transform = 'translateY(0)';
+            }, 100 + (index * 100));
+        });
+    }
+
 });
 
 window.addEventListener('load', () => {
@@ -1222,3 +1343,93 @@ window.addEventListener('load', () => {
 
 document.addEventListener('click', tryToPlayVideo, { once: true });
 document.addEventListener('touchend', tryToPlayVideo, { once: true });
+
+function updateLatestNewsPreview() {
+    const previewContainer = document.getElementById('latest-news-preview');
+    // Also check for the section wrapper if we need to show/hide it
+    const previewSection = document.getElementById('latest-news-preview-section');
+
+    if (!previewContainer) return;
+
+    const data = nationData['news'];
+    const t = translations[currentLanguage];
+
+    if (!data || !data.images || data.images.length === 0) {
+        if (previewSection) previewSection.style.display = 'none';
+        return;
+    }
+
+    if (previewSection) previewSection.style.display = 'block';
+
+    // Sort by date (newest first)
+    const sortedImages = [...data.images].sort((a, b) => {
+        const dateA = convertDateStringToDate(a.startDate);
+        const dateB = convertDateStringToDate(b.startDate);
+        return dateB.getTime() - dateA.getTime();
+    });
+
+    // Take top 3
+    const latestThree = sortedImages.slice(0, 3);
+
+    previewContainer.innerHTML = '';
+
+    latestThree.forEach((item, index) => {
+        const previewItem = document.createElement('div');
+        previewItem.classList.add('news-preview-item');
+        previewItem.style.opacity = '0';
+        previewItem.style.transform = 'translateY(20px)';
+
+        // Image Wrapper
+        const imgWrapper = document.createElement('div');
+        imgWrapper.classList.add('news-preview-image-wrapper');
+
+        const img = document.createElement('img');
+        const altText = item.title || t['no_title'];
+        const finalAttributes = getOptimizedImageAttributes(item.url, altText);
+        img.src = finalAttributes.src;
+        img.alt = finalAttributes.alt;
+        img.loading = 'lazy';
+
+        imgWrapper.appendChild(img);
+
+        // Meta (Date | Category)
+        const meta = document.createElement('div');
+        meta.classList.add('news-preview-meta');
+
+        // Date
+        let dateStr = '';
+        try {
+            const dateObj = convertDateStringToDate(item.startDate);
+            const day = String(dateObj.getUTCDate()).padStart(2, '0');
+            const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+            const year = dateObj.getUTCFullYear();
+            dateStr = `${day}/${month}/${year}`;
+        } catch (e) {
+            dateStr = item.startDate;
+        }
+
+        // Construct "DATE | NEWS"
+        meta.innerHTML = `${dateStr} <span class="meta-separator">|</span> NEWS`;
+
+        // Title
+        const title = document.createElement('h3');
+        title.classList.add('news-preview-title');
+        title.textContent = item.title || t['no_title'];
+
+        previewItem.appendChild(imgWrapper);
+        previewItem.appendChild(meta);
+        previewItem.appendChild(title);
+
+        previewItem.addEventListener('click', () => {
+            openOverlay(item);
+        });
+
+        previewContainer.appendChild(previewItem);
+
+        // Animate in
+        setTimeout(() => {
+            previewItem.style.opacity = '1';
+            previewItem.style.transform = 'translateY(0)';
+        }, 100 + (index * 100));
+    });
+}
