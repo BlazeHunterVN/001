@@ -969,14 +969,12 @@ body.hide-footer .footer {
 }
 
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .latest-news-preview {
         grid-template-columns: 1fr;
         padding: 1rem 1rem;
     }
 
-    /* Mobile News Grid - Horizontal Scroll */
     .latest-news-grid {
         display: flex !important;
         flex-direction: row !important;
@@ -999,7 +997,6 @@ body.hide-footer .footer {
         scroll-snap-align: start;
     }
 
-    /* Mobile Background Adjustments */
     #background-image {
         display: none !important;
     }
@@ -1021,7 +1018,6 @@ body.hide-footer .footer {
     }
 }
 
-/* Scrollable Home Fix */
 #home-section.home-scrollable {
     height: auto !important;
     min-height: 100vh;
@@ -1035,7 +1031,6 @@ body.hide-footer .footer {
     display: flex !important;
 }
 
-/* Ensure body/main allows scrolling */
 body,
 .main-content {
     overflow-y: auto !important;
@@ -1054,7 +1049,6 @@ body,
     overflow: hidden;
 }
 
-/* LATEST NEWS Section Styles (Matching Garena) */
 .latest-news-section {
     background-color: #ffffff;
     padding: 4rem 10%;
@@ -1106,29 +1100,78 @@ body,
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
     transition: color 0.3s;
+}
+
+.view-all-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.mobile-news-counter {
+    display: none;
+    font-size: 1rem;
+    color: #888;
+    margin-left: 10px;
+    font-weight: 500;
 }
 
 .view-all-link:hover {
     color: #ffba00 !important;
     background: transparent !important;
+    transform: none !important;
 }
 
 .view-more-icon {
     width: 15px;
     height: 11px;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.view-all-link:hover .view-more-icon {
+    transform: translateX(5px);
 }
 
 .view-all-link:hover .view-more-icon path {
     fill: #ffba00;
 }
 
-/* Grid Layout */
 .latest-news-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .latest-news-grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 20px;
+        gap: 15px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .latest-news-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .news-preview-item {
+        min-width: 85vw;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+
+    .mobile-news-counter {
+        display: inline-block !important;
+        position: relative;
+        top: -1px;
+    }
 }
 
 .news-preview-item {
@@ -1154,10 +1197,6 @@ body,
     transition: transform 0.3s ease;
 }
 
-.news-preview-item:hover img {
-    transform: scale(1.05);
-}
-
 .news-preview-meta {
     font-size: 0.85rem;
     color: #888;
@@ -1174,6 +1213,18 @@ body,
     font-weight: bold;
 }
 
+@keyframes slideUpTitle {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .news-preview-title {
     font-size: 1.4rem;
     font-weight: 700;
@@ -1183,9 +1234,14 @@ body,
     text-align: left;
     text-transform: uppercase;
     font-style: normal;
+    opacity: 0;
 }
 
-/* Footer Styles Update */
+.scroll-animate.animated .news-preview-title {
+    animation: slideUpTitle 0.6s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
 .footer {
     background-color: #000 !important;
     color: #888;
@@ -1204,6 +1260,27 @@ body,
     margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+    .footer-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .footer-content p {
+        order: 1;
+        text-align: center;
+    }
+
+    .dmca-badge-container {
+        order: 2;
+        justify-content: center;
+        margin: 0;
+    }
+}
+
 .footer-content p {
     grid-column: 2;
     margin: 0;
@@ -1218,7 +1295,6 @@ body,
     justify-content: flex-start;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
     .latest-news-title-group h2 {
         font-size: 2.5rem;
@@ -1233,6 +1309,12 @@ body,
     .latest-news-header {
         flex-direction: row;
         align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .view-all-link {
+        margin-left: 0;
     }
 
     .latest-news-title-group h2 {

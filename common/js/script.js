@@ -117,7 +117,7 @@ const mobileLangSelector = document.getElementById('mobileLangSelector');
 const desktopLangSelector = document.getElementById('desktopLangSelector');
 
 const languageLinks = document.querySelectorAll('.language-menu a');
-let navLinks = document.querySelectorAll('.nav-links a');
+let navLinks = document.querySelectorAll('.nav-link');
 
 const backgroundVideo = document.getElementById('background-video');
 function getIsMobile() {
@@ -199,12 +199,11 @@ function applyTranslation(langKey) {
     currentLanguage = langKey;
     const currentPath = window.location.pathname;
     const parts = currentPath.split('/');
-    const key = parts[parts.length - 1]; // This might be empty for home
+    const key = parts[parts.length - 1];
 
     if (currentPath.startsWith('/nation') || currentPath === '/news') {
         updateSectionHeadings(currentPath, key);
 
-        // RE-RENDER IMAGES TO UPDATE LABELS (Active/Upcoming/Date)
         if (currentPath.startsWith('/nation/')) {
             displayImages(key, false);
         } else if (currentPath === '/nation') {
@@ -213,7 +212,6 @@ function applyTranslation(langKey) {
             displayImages('news', true);
         }
 
-        // Update news preview with new language
         updateLatestNewsPreview();
     }
 }
@@ -301,13 +299,11 @@ async function fetchDataFromAPI(silent = false) {
                 displayImages('news', true);
             }
 
-            // Always update the home news preview if the element exists
             updateLatestNewsPreview();
 
             console.log("%c[Auto-Refresh] ✅ UI updated successfully!", "color: #4caf50; font-weight: bold;");
         } else {
             if (!silent) console.log("[Auto-Refresh] No changes detected.");
-            // Also ensure it's populated on initial load even if no change
             updateLatestNewsPreview();
         }
 
@@ -329,12 +325,6 @@ async function fetchDataFromAPI(silent = false) {
         isFetching = false;
     }
 }
-
-// Auto-refresh DISABLED to prevent constant reloading
-// console.log("%c[Auto-Refresh] 🔄 Polling started. Checking for updates every 10 seconds...", "color: #2196f3; font-weight: bold;");
-// setInterval(() => {
-//     fetchDataFromAPI(true);
-// }, 10000);
 
 async function fetchHomeSettings() {
     console.log("%c[Background-Engine] Initializing... v1.6 (Deep-Sync)", "color: #00ff00; font-weight: bold;");
@@ -773,15 +763,12 @@ function displayImages(key, isNews = false) {
     });
 
     images.sort((a, b) => {
-        // Get status for both items
         const statusA = getBannerStatus(a.startDate, a.endDate).status;
         const statusB = getBannerStatus(b.startDate, b.endDate).status;
 
-        // ENDING items go to the end
         if (statusA === 'ending' && statusB !== 'ending') return 1;
         if (statusA !== 'ending' && statusB === 'ending') return -1;
 
-        // For items with same status priority, sort by date
         const dateA = convertDateStringToDate(a.startDate);
         const dateB = convertDateStringToDate(b.startDate);
 
@@ -927,7 +914,7 @@ function populateNationDropdown() {
         dropdownMenu.appendChild(li);
     });
 
-    navLinks = document.querySelectorAll('.nav-links a');
+    navLinks = document.querySelectorAll('.nav-link');
     attachAllNavLinkListeners();
 }
 
@@ -1215,7 +1202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const key = parts[parts.length - 1] || '';
     handleRouting(currentPath, key);
 
-    // Immediately update news preview on home page
     setTimeout(() => {
         if (currentPath === '/' || currentPath === '/index.html' || currentPath === '') {
             updateLatestNewsPreview();
@@ -1293,11 +1279,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             previewContainer.appendChild(previewItem);
+
+            previewItem.classList.add('scroll-animate');
+
             setTimeout(() => {
-                previewItem.style.opacity = '1';
-                previewItem.style.transform = 'translateY(0)';
+                previewItem.classList.add('animated');
             }, 100 + (index * 100));
+
+            observeScrollAnimation(previewItem);
         });
+
+        const mobileCounter = document.getElementById('mobile-news-counter');
+        if (mobileCounter) {
+
+            const updateCounter = () => {
+                const newsItems = previewContainer.querySelectorAll('.news-preview-item');
+                const totalItems = newsItems.length;
+                if (totalItems === 0) return;
+
+                const firstItem = newsItems[0];
+                if (!firstItem || firstItem.offsetWidth === 0) {
+                    if (!mobileCounter.textContent) mobileCounter.textContent = `1/${totalItems}`;
+                    return;
+                }
+
+                const itemWidth = firstItem.offsetWidth + 15;
+                const currentSlide = Math.min(Math.max(Math.round(previewContainer.scrollLeft / itemWidth) + 1, 1), totalItems);
+                mobileCounter.textContent = `${currentSlide}/${totalItems}`;
+            };
+
+            setTimeout(updateCounter, 100);
+
+            previewContainer.addEventListener('scroll', () => {
+                window.requestAnimationFrame(updateCounter);
+            });
+
+            window.addEventListener('resize', updateCounter);
+        }
     }
 });
 
