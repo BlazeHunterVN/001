@@ -521,6 +521,7 @@ function handleRouting(path, key) {
     if (path === '/') {
         showSection(homeSection);
         if (nationHeading) nationHeading.textContent = '';
+        updateLatestNewsPreview();
     }
     else if (path.startsWith('/nation/')) {
         showSection(nationSection);
@@ -541,6 +542,7 @@ function handleRouting(path, key) {
         showSection(contactSection);
     } else {
         showSection(homeSection);
+        updateLatestNewsPreview();
     }
 
     if (window.location.pathname !== path) {
