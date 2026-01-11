@@ -992,8 +992,8 @@ body.hide-footer .footer {
     }
 
     .news-preview-item {
-        flex: 0 0 85%;
-        min-width: 85%;
+        flex: 0 0 75%;
+        min-width: 75%;
         scroll-snap-align: start;
     }
 
@@ -1106,7 +1106,7 @@ body,
 }
 
 .view-all-container {
-    margin-top: 2rem;
+    margin-top: 3.5rem;
     display: flex;
     justify-content: flex-start;
 }
@@ -1151,10 +1151,13 @@ body,
         display: flex;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
+        padding: 0 12.5vw 20px 12.5vw;
         padding-bottom: 20px;
         gap: 15px;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .latest-news-grid::-webkit-scrollbar {
@@ -1162,15 +1165,16 @@ body,
     }
 
     .news-preview-item {
-        min-width: 85vw;
-        scroll-snap-align: start;
+        width: 75vw;
+        min-width: 75vw;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
         flex-shrink: 0;
     }
 
     .mobile-news-counter {
         display: inline-block !important;
         position: relative;
-        top: -1px;
     }
 }
 
@@ -1179,6 +1183,18 @@ body,
     cursor: pointer;
     display: flex;
     flex-direction: column;
+}
+
+.news-preview-item.scroll-animate {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.news-preview-item.scroll-animate {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
 }
 
 .news-preview-image-wrapper {
@@ -1194,7 +1210,6 @@ body,
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
-    transition: transform 0.3s ease;
 }
 
 .news-preview-meta {
@@ -1303,7 +1318,7 @@ body,
 
 @media (max-width: 768px) {
     .latest-news-section {
-        padding: 2rem 5%;
+        padding: 2rem 0;
     }
 
     .latest-news-header {
@@ -1311,10 +1326,15 @@ body,
         align-items: center;
         gap: 10px;
         justify-content: space-between;
+        padding: 0 12.5vw;
     }
 
     .view-all-link {
         margin-left: 0;
+    }
+
+    .view-all-container {
+        padding: 0 12.5vw;
     }
 
     .latest-news-title-group h2 {
@@ -1327,6 +1347,6 @@ body,
     }
 
     .news-preview-title {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 }

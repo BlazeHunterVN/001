@@ -1235,8 +1235,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         latestThree.forEach((item, index) => {
             const previewItem = document.createElement('div');
             previewItem.classList.add('news-preview-item');
-            previewItem.style.opacity = '0';
-            previewItem.style.transform = 'translateY(20px)';
+            previewItem.classList.add('news-preview-item');
+            // Removed opacity/transform for image/container animation
+
 
             const imgWrapper = document.createElement('div');
             imgWrapper.classList.add('news-preview-image-wrapper');
