@@ -199,7 +199,6 @@ async function checkAdminRole() {
 }
 
 window.addEventListener('load', () => {
-    // If we have grant, but no email, we should re-verify session to get the email
     if (localStorage.getItem('admin_granted') === 'true' && localStorage.getItem('admin_email')) {
         showDashboard();
     } else {
@@ -219,6 +218,13 @@ function showDashboard() {
         autoCleanupBanners();
     });
     fetchHomeSettings();
+
+    setInterval(() => {
+        if (localStorage.getItem('admin_granted') === 'true') {
+            fetchBanners();
+            fetchHomeSettings();
+        }
+    }, 30000);
 }
 
 async function autoCleanupBanners() {
@@ -229,6 +235,7 @@ async function autoCleanupBanners() {
 
     const expiredIds = allBanners.filter(banner => {
         if (!banner.end_date) return false;
+        if (banner.nation_key === 'news') return false; // Never auto-delete news
         const end = parseDateString(banner.end_date);
         if (!end) return false;
 

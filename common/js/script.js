@@ -741,6 +741,7 @@ function displayImages(key, isNews = false) {
     targetGrid.removeAttribute('style');
 
     images = images.filter(imageData => {
+        if (isNews) return true;
         const { status } = getBannerStatus(imageData.startDate, imageData.endDate);
         const start = convertDateStringToDate(imageData.startDate);
         if (start.getTime() === 0) return true;
@@ -1312,6 +1313,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateLatestNewsPreview();
         }
     }, 0);
+
+    setInterval(async () => {
+        await fetchDataFromAPI(true);
+        await fetchHomeSettings();
+    }, 30000);
 });
 
 window.addEventListener('load', () => {
