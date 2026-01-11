@@ -974,181 +974,163 @@ if (mobileLangSelector) {
             if (gridItem && !gridItem.classList.contains('updating-message')) {
                 const key = gridItem.dataset.key;
                 const id = parseInt(gridItem.dataset.id);
-
                 const data = nationData[key].images.find(img => img.id === id);
-                const isNews = key === 'news';
-
-                if (data) {
-                    const t = translations[currentLanguage];
-                    if (gridOverlay) {
-                        gridOverlay.style.display = 'flex';
-                        document.body.style.overflow = 'hidden';
-
-                        overlayTitle.textContent = data.title || t['no_title'];
-
-                        const dateValue = data.startDate;
-                        const endDateFromDB = data.endDate;
-
-                        if (dateValue && dateValue.trim() !== '') {
-                            const dateLabel = isNews ? t['date_posting'] : t['start_date'];
-
-                            let displayStartDate = dateValue;
-                            const startObj = convertDateStringToDate(dateValue);
-                            if (!isNaN(startObj.getTime()) && startObj.getTime() !== 0) {
-                                const day = String(startObj.getUTCDate()).padStart(2, '0');
-                                const month = String(startObj.getUTCMonth() + 1).padStart(2, '0');
-                                const year = startObj.getUTCFullYear();
-                                displayStartDate = `${day}/${month}/${year}`;
-                            }
-
-                            let dateText = `${dateLabel}: ${displayStartDate}`;
-
-                            if (!isNews) {
-                                let displayEndDate = "";
-                                if (endDateFromDB && endDateFromDB.trim() !== '') {
-                                    displayEndDate = endDateFromDB;
-                                } else {
-                                    const start = convertDateStringToDate(dateValue);
-                                    if (!isNaN(start.getTime())) {
-                                        const end = new Date(start);
-                                        end.setUTCDate(end.getUTCDate() + 10);
-                                        const day = String(end.getUTCDate()).padStart(2, '0');
-                                        const month = String(end.getUTCMonth() + 1).padStart(2, '0');
-                                        const year = end.getUTCFullYear();
-                                        displayEndDate = `${day}/${month}/${year}`;
-                                    }
-                                }
-
-                                if (displayEndDate) {
-                                    dateText += `<br>END DATE: ${displayEndDate}`;
-                                }
-                            }
-
-                            overlayDate.innerHTML = dateText;
-                            overlayDate.style.display = 'block';
-                        } else {
-                            overlayDate.textContent = '';
-                            overlayDate.style.display = 'none';
-                        }
-
-                        overlayLink.textContent = t['link_access'];
-                        if (data.bannerLink) {
-                            overlayLink.href = data.bannerLink;
-                            overlayLink.style.display = 'block';
-                        } else {
-                            overlayLink.href = '#';
-                            overlayLink.style.display = 'none';
-                        }
-
-                        if (overlayDownload) {
-                            if (isNews || !dateValue || dateValue.trim() === '') {
-                                overlayDownload.style.display = 'none';
-                            } else {
-                                overlayDownload.style.display = 'block';
-                                overlayDownload.textContent = t['download_image'];
-                                overlayDownload.onclick = async (e) => {
-                                    e.preventDefault();
-                                    const originalText = overlayDownload.textContent;
-                                    overlayDownload.textContent = 'Downloading...';
-                                    overlayDownload.style.pointerEvents = 'none';
-                                    overlayDownload.style.opacity = '0.7';
-
-                                    const url = data.url;
-                                    const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
-
-                                    const isLocalhost = window.location.hostname === 'localhost' ||
-                                        window.location.hostname === '127.0.0.1' ||
-                                        window.location.hostname.includes('192.168');
-
-                                    try {
-                                        if (isLocalhost) {
-                                            // On localhost, try direct download
-                                            const response = await fetch(url);
-                                            const blob = await response.blob();
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = blobUrl;
-                                            link.download = fileName;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(blobUrl);
-                                        } else {
-                                            const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
-
-                                            window.location.assign(proxyUrl);
-
-                                            setTimeout(() => {
-                                                overlayDownload.textContent = originalText;
-                                                overlayDownload.style.pointerEvents = 'auto';
-                                                overlayDownload.style.opacity = '1';
-                                            }, 2000);
-
-                                            return;
-                                        }
-
-                                    } catch (error) {
-                                        console.error('Download failed:', error);
-                                        window.open(url, '_blank');
-                                    } finally {
-                                        overlayDownload.textContent = originalText;
-                                        overlayDownload.style.pointerEvents = 'auto';
-                                        overlayDownload.style.opacity = '1';
-                                    }
-                                };
-                            }
-                        }
-
-                        const overlayImgContainer = document.getElementById('overlay-image-container');
-                        overlayImgContainer.innerHTML = '';
-
-                        if (!data.url || data.url.trim() === '') {
-                            overlayImgContainer.classList.add('no-image');
-                            const updatingDiv = document.createElement('div');
-                            updatingDiv.textContent = 'Updating...';
-                            updatingDiv.classList.add('updating-message');
-                            updatingDiv.style.width = '100%';
-                            updatingDiv.style.height = '200px';
-                            updatingDiv.style.display = 'flex';
-                            updatingDiv.style.alignItems = 'center';
-                            updatingDiv.style.justifyContent = 'center';
-                            updatingDiv.style.backgroundColor = '#f0f0f0';
-                            updatingDiv.style.color = '#888';
-                            updatingDiv.style.fontWeight = 'bold';
-                            overlayImgContainer.appendChild(updatingDiv);
-                        } else {
-                            overlayImgContainer.classList.remove('no-image');
-                            const imgElement = document.createElement('img');
-                            imgElement.src = data.url;
-                            imgElement.alt = data.title || t['no_title'];
-
-                            imgElement.onerror = () => {
-                                overlayImgContainer.classList.add('no-image');
-                                const updatingDiv = document.createElement('div');
-                                updatingDiv.textContent = 'Updating...';
-                                updatingDiv.classList.add('updating-message');
-                                updatingDiv.style.width = '100%';
-                                updatingDiv.style.height = '200px';
-                                updatingDiv.style.display = 'flex';
-                                updatingDiv.style.alignItems = 'center';
-                                updatingDiv.style.justifyContent = 'center';
-                                updatingDiv.style.backgroundColor = '#f0f0f0';
-                                updatingDiv.style.color = '#888';
-                                updatingDiv.style.fontWeight = 'bold';
-
-                                if (imgElement.parentNode) {
-                                    imgElement.parentNode.replaceChild(updatingDiv, imgElement);
-                                }
-                            };
-
-                            overlayImgContainer.appendChild(imgElement);
-                        }
-                    }
-                }
+                if (data) openOverlay(data, key === 'news');
             }
         });
     }
 });
+
+function openOverlay(data, isNews = false) {
+    const t = translations[currentLanguage];
+    if (!gridOverlay) return;
+
+    gridOverlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    overlayTitle.textContent = data.title || t['no_title'];
+
+    const dateValue = data.startDate;
+    const endDateFromDB = data.endDate;
+
+    if (dateValue && dateValue.trim() !== '') {
+        const dateLabel = isNews ? t['date_posting'] : t['start_date'];
+        let displayStartDate = dateValue;
+        const startObj = convertDateStringToDate(dateValue);
+        if (!isNaN(startObj.getTime()) && startObj.getTime() !== 0) {
+            const day = String(startObj.getUTCDate()).padStart(2, '0');
+            const month = String(startObj.getUTCMonth() + 1).padStart(2, '0');
+            const year = startObj.getUTCFullYear();
+            displayStartDate = `${day}/${month}/${year}`;
+        }
+
+        let dateText = `${dateLabel}: ${displayStartDate}`;
+        if (!isNews) {
+            let displayEndDate = "";
+            if (endDateFromDB && endDateFromDB.trim() !== '') {
+                displayEndDate = endDateFromDB;
+            } else {
+                const start = convertDateStringToDate(dateValue);
+                if (!isNaN(start.getTime())) {
+                    const end = new Date(start);
+                    end.setUTCDate(end.getUTCDate() + 10);
+                    const day = String(end.getUTCDate()).padStart(2, '0');
+                    const month = String(end.getUTCMonth() + 1).padStart(2, '0');
+                    const year = end.getUTCFullYear();
+                    displayEndDate = `${day}/${month}/${year}`;
+                }
+            }
+            if (displayEndDate) dateText += `<br>END DATE: ${displayEndDate}`;
+        }
+        overlayDate.innerHTML = dateText;
+        overlayDate.style.display = 'block';
+    } else {
+        overlayDate.textContent = '';
+        overlayDate.style.display = 'none';
+    }
+
+    overlayLink.textContent = t['link_access'];
+    if (data.bannerLink) {
+        overlayLink.href = data.bannerLink;
+        overlayLink.style.display = 'block';
+    } else {
+        overlayLink.href = '#';
+        overlayLink.style.display = 'none';
+    }
+
+    if (overlayDownload) {
+        if (isNews || !dateValue || dateValue.trim() === '') {
+            overlayDownload.style.display = 'none';
+        } else {
+            overlayDownload.style.display = 'block';
+            overlayDownload.textContent = t['download_image'];
+            overlayDownload.onclick = async (e) => {
+                e.preventDefault();
+                const originalText = overlayDownload.textContent;
+                overlayDownload.textContent = 'Downloading...';
+                overlayDownload.style.pointerEvents = 'none';
+                overlayDownload.style.opacity = '0.7';
+
+                const url = data.url;
+                const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
+                const isLocalhost = window.location.hostname === 'localhost' ||
+                    window.location.hostname === '127.0.0.1' ||
+                    window.location.hostname.includes('192.168');
+
+                try {
+                    if (isLocalhost) {
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                    } else {
+                        const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
+                        window.location.assign(proxyUrl);
+                        setTimeout(() => {
+                            overlayDownload.textContent = originalText;
+                            overlayDownload.style.pointerEvents = 'auto';
+                            overlayDownload.style.opacity = '1';
+                        }, 2000);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    window.open(url, '_blank');
+                } finally {
+                    overlayDownload.textContent = originalText;
+                    overlayDownload.style.pointerEvents = 'auto';
+                    overlayDownload.style.opacity = '1';
+                }
+            };
+        }
+    }
+
+    const overlayImgContainer = document.getElementById('overlay-image-container');
+    overlayImgContainer.innerHTML = '';
+
+    if (!data.url || data.url.trim() === '') {
+        overlayImgContainer.classList.add('no-image');
+        const updatingDiv = document.createElement('div');
+        updatingDiv.textContent = 'Updating...';
+        updatingDiv.classList.add('updating-message');
+        updatingDiv.style.width = '100%';
+        updatingDiv.style.height = '200px';
+        updatingDiv.style.display = 'flex';
+        updatingDiv.style.alignItems = 'center';
+        updatingDiv.style.justifyContent = 'center';
+        updatingDiv.style.backgroundColor = '#f0f0f0';
+        updatingDiv.style.color = '#888';
+        updatingDiv.style.fontWeight = 'bold';
+        overlayImgContainer.appendChild(updatingDiv);
+    } else {
+        overlayImgContainer.classList.remove('no-image');
+        const imgElement = document.createElement('img');
+        imgElement.src = data.url;
+        imgElement.alt = data.title || t['no_title'];
+        imgElement.onerror = () => {
+            overlayImgContainer.classList.add('no-image');
+            const updatingDiv = document.createElement('div');
+            updatingDiv.textContent = 'Updating...';
+            updatingDiv.classList.add('updating-message');
+            updatingDiv.style.width = '100%';
+            updatingDiv.style.height = '200px';
+            updatingDiv.style.display = 'flex';
+            updatingDiv.style.alignItems = 'center';
+            updatingDiv.style.justifyContent = 'center';
+            updatingDiv.style.backgroundColor = '#f0f0f0';
+            updatingDiv.style.color = '#888';
+            updatingDiv.style.fontWeight = 'bold';
+            if (imgElement.parentNode) imgElement.parentNode.replaceChild(updatingDiv, imgElement);
+        };
+        overlayImgContainer.appendChild(imgElement);
+    }
+}
 
 if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -1242,9 +1224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateLatestNewsPreview() {
         const previewContainer = document.getElementById('latest-news-preview');
-        // Also check for the section wrapper if we need to show/hide it
         const previewSection = document.getElementById('latest-news-preview-section');
-
         if (!previewContainer) return;
 
         const data = nationData['news'];
@@ -1257,16 +1237,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (previewSection) previewSection.style.display = 'block';
 
-        // Sort by date (newest first)
         const sortedImages = [...data.images].sort((a, b) => {
             const dateA = convertDateStringToDate(a.startDate);
             const dateB = convertDateStringToDate(b.startDate);
             return dateB.getTime() - dateA.getTime();
         });
 
-        // Take top 3
         const latestThree = sortedImages.slice(0, 3);
-
         previewContainer.innerHTML = '';
 
         latestThree.forEach((item, index) => {
@@ -1275,24 +1252,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             previewItem.style.opacity = '0';
             previewItem.style.transform = 'translateY(20px)';
 
-            // Image Wrapper
             const imgWrapper = document.createElement('div');
             imgWrapper.classList.add('news-preview-image-wrapper');
-
             const img = document.createElement('img');
             const altText = item.title || t['no_title'];
             const finalAttributes = getOptimizedImageAttributes(item.url, altText);
             img.src = finalAttributes.src;
             img.alt = finalAttributes.alt;
             img.loading = 'lazy';
-
             imgWrapper.appendChild(img);
 
-            // Meta (Date | Category)
             const meta = document.createElement('div');
             meta.classList.add('news-preview-meta');
-
-            // Date
             let dateStr = '';
             try {
                 const dateObj = convertDateStringToDate(item.startDate);
@@ -1303,11 +1274,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (e) {
                 dateStr = item.startDate;
             }
-
-            // Construct "DATE | NEWS"
             meta.innerHTML = `${dateStr} <span class="meta-separator">|</span> NEWS`;
 
-            // Title
             const title = document.createElement('h3');
             title.classList.add('news-preview-title');
             title.textContent = item.title || t['no_title'];
@@ -1317,19 +1285,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             previewItem.appendChild(title);
 
             previewItem.addEventListener('click', () => {
-                openOverlay(item);
+                if (item.bannerLink) {
+                    window.open(item.bannerLink, '_blank');
+                } else {
+                    openOverlay(item, true);
+                }
             });
 
             previewContainer.appendChild(previewItem);
-
-            // Animate in
             setTimeout(() => {
                 previewItem.style.opacity = '1';
                 previewItem.style.transform = 'translateY(0)';
             }, 100 + (index * 100));
         });
     }
-
 });
 
 window.addEventListener('load', () => {
@@ -1343,93 +1312,3 @@ window.addEventListener('load', () => {
 
 document.addEventListener('click', tryToPlayVideo, { once: true });
 document.addEventListener('touchend', tryToPlayVideo, { once: true });
-
-function updateLatestNewsPreview() {
-    const previewContainer = document.getElementById('latest-news-preview');
-    // Also check for the section wrapper if we need to show/hide it
-    const previewSection = document.getElementById('latest-news-preview-section');
-
-    if (!previewContainer) return;
-
-    const data = nationData['news'];
-    const t = translations[currentLanguage];
-
-    if (!data || !data.images || data.images.length === 0) {
-        if (previewSection) previewSection.style.display = 'none';
-        return;
-    }
-
-    if (previewSection) previewSection.style.display = 'block';
-
-    // Sort by date (newest first)
-    const sortedImages = [...data.images].sort((a, b) => {
-        const dateA = convertDateStringToDate(a.startDate);
-        const dateB = convertDateStringToDate(b.startDate);
-        return dateB.getTime() - dateA.getTime();
-    });
-
-    // Take top 3
-    const latestThree = sortedImages.slice(0, 3);
-
-    previewContainer.innerHTML = '';
-
-    latestThree.forEach((item, index) => {
-        const previewItem = document.createElement('div');
-        previewItem.classList.add('news-preview-item');
-        previewItem.style.opacity = '0';
-        previewItem.style.transform = 'translateY(20px)';
-
-        // Image Wrapper
-        const imgWrapper = document.createElement('div');
-        imgWrapper.classList.add('news-preview-image-wrapper');
-
-        const img = document.createElement('img');
-        const altText = item.title || t['no_title'];
-        const finalAttributes = getOptimizedImageAttributes(item.url, altText);
-        img.src = finalAttributes.src;
-        img.alt = finalAttributes.alt;
-        img.loading = 'lazy';
-
-        imgWrapper.appendChild(img);
-
-        // Meta (Date | Category)
-        const meta = document.createElement('div');
-        meta.classList.add('news-preview-meta');
-
-        // Date
-        let dateStr = '';
-        try {
-            const dateObj = convertDateStringToDate(item.startDate);
-            const day = String(dateObj.getUTCDate()).padStart(2, '0');
-            const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-            const year = dateObj.getUTCFullYear();
-            dateStr = `${day}/${month}/${year}`;
-        } catch (e) {
-            dateStr = item.startDate;
-        }
-
-        // Construct "DATE | NEWS"
-        meta.innerHTML = `${dateStr} <span class="meta-separator">|</span> NEWS`;
-
-        // Title
-        const title = document.createElement('h3');
-        title.classList.add('news-preview-title');
-        title.textContent = item.title || t['no_title'];
-
-        previewItem.appendChild(imgWrapper);
-        previewItem.appendChild(meta);
-        previewItem.appendChild(title);
-
-        previewItem.addEventListener('click', () => {
-            openOverlay(item);
-        });
-
-        previewContainer.appendChild(previewItem);
-
-        // Animate in
-        setTimeout(() => {
-            previewItem.style.opacity = '1';
-            previewItem.style.transform = 'translateY(0)';
-        }, 100 + (index * 100));
-    });
-}
