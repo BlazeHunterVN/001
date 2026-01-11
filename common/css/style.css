@@ -257,6 +257,7 @@ body.non-home-bg #contact-section.content-section.active {
     transform: translate(-50%, -50%);
     object-fit: cover;
     display: block;
+    object-position: center 0%;
 }
 
 #background-image-mobile {
@@ -1087,7 +1088,7 @@ body,
 
 .mobile-news-counter {
     display: none;
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: #888;
     margin-left: 10px;
     font-weight: 500;
@@ -1149,6 +1150,7 @@ body,
     .mobile-news-counter {
         display: inline-block !important;
         position: relative;
+        top: 33px;
     }
 }
 
@@ -1300,7 +1302,7 @@ body,
         align-items: center;
         gap: 10px;
         justify-content: space-between;
-        padding: 0 11.5%;
+        padding: 0 12%;
     }
 
     .view-all-link {
@@ -1308,7 +1310,7 @@ body,
     }
 
     .view-all-container {
-        padding: 0 11.5%;
+        padding: 0 12%;
     }
 
     .latest-news-title-group h2 {
