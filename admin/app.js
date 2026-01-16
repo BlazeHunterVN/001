@@ -242,11 +242,11 @@ async function autoCleanupBanners() {
         const diffTime = today.getTime() - end.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        return diffDays > 30;
+        return diffDays > 10;
     }).map(b => parseInt(b.id));
 
     if (expiredIds.length > 0) {
-        console.log(`Auto-cleaning ${expiredIds.length} expired banners older than 30 days.`);
+        console.log(`Auto-cleaning ${expiredIds.length} expired banners older than 10 days.`);
         const email = localStorage.getItem('admin_email');
         const key = localStorage.getItem('admin_key');
 

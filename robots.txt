@@ -1,15 +1,14 @@
 # ============================================
-# Free Fire Posters - robots.txt
+# Zone Posters - robots.txt
 # Website: https://zoneposters.vercel.app/
-# Purpose: Image gallery for Free Fire promotional posters
+# Purpose: Image gallery for Free Fire promotional gallery
 # ============================================
 
 # WEBSITE PURPOSE & SAFETY NOTICE:
 # This is a NON-COMMERCIAL image gallery website
-# We display official Free Fire promotional images
+# We display fan-curated Free Fire promotional images
 # We DO NOT collect personal information from visitors
 # We DO NOT sell products or require registration
-# Images are downloaded directly to user devices only
 
 # --------------------------------------------
 # Search Engine Access Rules

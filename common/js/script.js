@@ -33,7 +33,6 @@ const translations = {
         'ending': 'SẮP KẾT THÚC',
         'check_back': 'VUI LÒNG KIỂM TRA LẠI SAU.',
         'check_back_news': 'VUI LÒNG KIỂM TRA LẠI SAU ĐỂ CẬP NHẬT TIN TỨC MỚI NHẤT.',
-        'download_image': 'TẢI ẢNH VỀ THIẾT BỊ',
         'privacy_policy': 'CHÍNH SÁCH BẢO MẬT',
         'view_all': 'XEM TẤT CẢ',
         'latest_news': 'TIN TỨC MỚI NHẤT'
@@ -68,7 +67,6 @@ const translations = {
         'ending': 'ENDING',
         'check_back': 'PLEASE CHECK BACK LATER.',
         'check_back_news': 'PLEASE CHECK BACK LATER FOR THE LATEST NEWS.',
-        'download_image': 'DOWNLOAD IMAGE',
         'privacy_policy': 'PRIVACY POLICY',
         'view_all': 'VIEW ALL',
         'latest_news': 'LATEST NEWS'
@@ -108,7 +106,6 @@ const gridOverlay = document.getElementById('grid-overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayDate = document.getElementById('overlay-date');
 const overlayLink = document.getElementById('overlay-link');
-const overlayDownload = document.getElementById('overlay-download');
 const closeBtn = document.querySelector('.close-btn');
 const overlayImage = document.getElementById('overlay-image');
 const nationDropdownLi = document.querySelector('.dropdown:not(.language-selector)');
@@ -623,7 +620,7 @@ function getBannerStatus(startDateStr, endDateStr) {
     const diffDaysSinceEnd = Math.floor(diffTimeSinceEnd / (1000 * 60 * 60 * 24));
 
     if (diffDaysSinceEnd >= 0) {
-        if (diffDaysSinceEnd > 30) {
+        if (diffDaysSinceEnd > 10) {
             return { status: 'none', label: '', endDate: end };
         }
         return { status: 'ending', label: t['ending'] || 'ENDING', endDate: end };
@@ -1026,59 +1023,6 @@ function openOverlay(data, isNews = false) {
     } else {
         overlayLink.href = '#';
         overlayLink.style.display = 'none';
-    }
-
-    if (overlayDownload) {
-        if (isNews || !dateValue || dateValue.trim() === '') {
-            overlayDownload.style.display = 'none';
-        } else {
-            overlayDownload.style.display = 'block';
-            overlayDownload.textContent = t['download_image'];
-            overlayDownload.onclick = async (e) => {
-                e.preventDefault();
-                const originalText = overlayDownload.textContent;
-                overlayDownload.textContent = 'Downloading...';
-                overlayDownload.style.pointerEvents = 'none';
-                overlayDownload.style.opacity = '0.7';
-
-                const url = data.url;
-                const fileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0] || 'image.jpg';
-                const isLocalhost = window.location.hostname === 'localhost' ||
-                    window.location.hostname === '127.0.0.1' ||
-                    window.location.hostname.includes('192.168');
-
-                try {
-                    if (isLocalhost) {
-                        const response = await fetch(url);
-                        const blob = await response.blob();
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = fileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(blobUrl);
-                    } else {
-                        const proxyUrl = `/api/download-image?url=${encodeURIComponent(url)}`;
-                        window.location.assign(proxyUrl);
-                        setTimeout(() => {
-                            overlayDownload.textContent = originalText;
-                            overlayDownload.style.pointerEvents = 'auto';
-                            overlayDownload.style.opacity = '1';
-                        }, 2000);
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Download failed:', error);
-                    window.open(url, '_blank');
-                } finally {
-                    overlayDownload.textContent = originalText;
-                    overlayDownload.style.pointerEvents = 'auto';
-                    overlayDownload.style.opacity = '1';
-                }
-            };
-        }
     }
 
     const overlayImgContainer = document.getElementById('overlay-image-container');
